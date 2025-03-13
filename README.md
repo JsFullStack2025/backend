@@ -22,6 +22,8 @@ Visiteo — это онлайн-конструктор открыток, поз�
 yarn install
 ```
 
+Copy file .env.example to .env and set you parametres
+
 ### Запуск приложения
 
 ```bash
