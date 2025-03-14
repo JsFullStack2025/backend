@@ -39,29 +39,34 @@ git checkout dev-...(название ветки)
 git add .
 git commit 'Название коммита'
 # пушим на сервер
-    git push origin dev-...(название ветки)
+git push origin dev-...(название ветки)
 ```
 
 # Устанавливаем требуемые пакеты:
-    npm install --global yarn
-    // проверка: yarn -v
-    npm install prisma --save-dev
-
+```bash
+npm install --global yarn
+# проверка: yarn -v
+npm install prisma --save-dev
 # Установка модулей
-    yarn install
+yarn install
+```
 
 # Запуск БД
     Копируем файл .env.example в файл .env
     Запускаем докер
+```bash
     docker-compose up -d // флаг -d для запуска в фоне
     docker ps
-
+```  
 # Инсталлируем базы
-    npx prisma migrate dev --name init
-
+```bash
+npx prisma migrate dev --name init
 # Проверяем создание баз через браузер (http://localhost:5555)
-    npx prisma studio
+npx prisma studio
+```
 
 # Запуск бэка
-    yarn run start:dev
-    // Проект запустится в http://localhost:3000
+```bash
+yarn run start:dev
+# Проект запустится в http://localhost:3000
+```
