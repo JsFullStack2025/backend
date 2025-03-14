@@ -1,9 +1,7 @@
-## Soft:
-
-# VS CODE
+### VS CODE
     https://code.visualstudio.com/download
 
-# GIT (64-bit)
+### GIT (64-bit)
     https://git-scm.com/downloads/win
 
 # Настраиваем GIT (user and email)
