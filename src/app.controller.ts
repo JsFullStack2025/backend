@@ -1,12 +1,13 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, NotFoundException, UseGuards, Request } from '@nestjs/common';
 import { AppService } from './app.service';
-import { UsersService } from './services/users.service'
+import { UsersService } from './users/users.service'
 import { Cards, Prisma, Users } from '@prisma/client';
 import { CardsService } from './services/cards.service';
 import { CreateUsersDto, UpdateUserDto } from './Entities/Users.dto';
 import { CreateCardDto, UpdateCardDto } from './Entities/Cards.dto';
 import { IResponseResult } from './Entities/IResponseResult';
 import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { LocalAuthGuard } from './auth/local-auth.guard';
 
 @Controller()
 export class AppController {
@@ -14,7 +15,7 @@ export class AppController {
     private readonly appService: AppService,
     private readonly userService: UsersService,
     private readonly cardsService: CardsService
-  ) {}
+  ) {} 
 
   @ApiOkResponse({ type: IResponseResult<string>, description: 'Test method' })
   @Get()
