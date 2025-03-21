@@ -1,5 +1,5 @@
-export interface IResponseResult<T> {
+export class IResponseResult<T> {
     success: boolean;
-    error: string;
-    value: T;
+    error?: string;
+    value?: T;
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { Users, Prisma, Cards } from '@prisma/client';
+import { Cards } from '@prisma/client';
 import { CreateCardDto, UpdateCardDto } from '@/Entities/Cards.dto';
 
 @Injectable()
@@ -16,6 +16,11 @@ export class CardsService {
       data: carddata
     });
   }
+  async cardById(userid:number): Promise<Cards | null> {
+      return this.prisma.cards.findUnique({
+        where: {id:userid},
+      });
+    }
 
   async updateCard(carddata: UpdateCardDto): Promise<Cards> {
     return this.prisma.cards.update({

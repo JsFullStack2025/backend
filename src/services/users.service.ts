@@ -1,17 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { Users, Prisma } from '@prisma/client';
-import { IResponseResult } from '../Entities/IResponseResult';
+import { Users } from '@prisma/client';
 import { CreateUsersDto, UpdateUserDto } from '@/Entities/Users.dto';
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async user(
-    userWhereUniqueInput: Prisma.UsersWhereUniqueInput,
-  ): Promise<Users | null> {
+  async userById(userid:number): Promise<Users | null> {
     return this.prisma.users.findUnique({
-      where: userWhereUniqueInput,
+      where: {id:userid},
     });
   }
 
