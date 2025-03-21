@@ -12,6 +12,7 @@ model Users {
   email       String   @unique
   login       String   @unique
   hash        String //@map("password_hash")
+  isAdmin     Boolean @default(false)
   first_name  String?
   middle_name String?
   last_name   String?

@@ -36,6 +36,8 @@ yarn run start:dev
 # Продакшен-режим
 yarn run start:prod
 ```
+## SWAGGER
+API можно посмотреть по адресу http://localhost:3000/api
 
 ## 📝 Лицензия
 
