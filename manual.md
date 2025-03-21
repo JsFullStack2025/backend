@@ -53,13 +53,14 @@ yarn install
     Копируем файл .env.example в файл .env
     Запускаем докер
 ```bash
-    docker-compose up -d // флаг -d для запуска в фоне
-    docker ps
+docker-compose up -d // флаг -d для запуска в фоне
+docker ps
 ```  
 ### Инсталлируем базы
 ```bash
 npx prisma migrate dev --name init
 # Проверяем создание баз через браузер (http://localhost:5555)
+cd prisma
 npx prisma studio
 ```
 

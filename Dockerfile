@@ -1,8 +1,8 @@
-FROM node:22.9
-RUN mkdir -p /opt/app
+FROM node:alpine
 WORKDIR /opt/app
 COPY package.json .
 RUN npm install
 COPY . .
+RUN npx prisma generate
 EXPOSE 3000
 CMD ["npm","start" ]

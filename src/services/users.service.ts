@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { Users, Prisma } from '@prisma/client';
-
+import { IResponseResult } from '../Entities/IResponseResult';
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -15,6 +15,7 @@ export class UsersService {
   }
 
   async users(): Promise<Users[]> {
+    IResponse
     return this.prisma.users.findMany();
   }
 
