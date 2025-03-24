@@ -11,7 +11,9 @@ export class CreateCardDto {
     shared?: boolean | undefined
 }
 
-export class UpdateCardDto extends CreateCardDto {
-    @ApiProperty({ description: "id карточки", nullable: true })
+export class UpdateCardDto {
+    @ApiProperty({ description: "id карточки", nullable: false })
     id: number;
+    cardData?: string;
+    shared?: boolean | undefined
 }
