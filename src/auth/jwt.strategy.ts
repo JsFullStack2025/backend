@@ -6,7 +6,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy,'jwt') {
-    constructor(private readonly configService: ConfigService){
+    constructor(){
         super({
             ignoreExpiration: false,
             secretOrKey: process.env.JWT_SECRET!,

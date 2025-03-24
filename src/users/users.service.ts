@@ -32,6 +32,7 @@ export class UsersService {
       data: userdata,
     });
   }
+
   async updateUserToken(userData:UpdateUserTokenDto): Promise<Users> {
     const user = await this.findAny({
       where: {id:userData.id}

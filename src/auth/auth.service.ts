@@ -20,33 +20,10 @@ export class AuthService {
   private async getPasswordHash(password: string): Promise<string> {
     return await argon2.hash(password);
   }
+
   private async checkPasswordHash(password: string, hash:string) {
     return await argon2.verify(hash, password);
   }
-//   public async registerUser(
-//     regModel: RegistrationReqModel,
-//   ): Promise<RegistrationRespModel> {
-//     let result = new RegistrationRespModel();
-
-//     const errorMessage = await this.registrationValidation(regModel);
-//     if (errorMessage) {
-//       result.message = errorMessage;
-//       result.successStatus = false;
-
-//       return result;
-//     }
-
-//     let newUser = new User();
-//     newUser.firstName = regModel.firstName;
-//     newUser.lastName = regModel.lastName;
-//     newUser.email = regModel.email;
-//     newUser.password = await this.getPasswordHash(regModel.password);
-
-//     await this.user.insert(newUser);
-//     result.successStatus = true;
-//     result.message = 'succeess';
-//     return result;
-//   }
 
   public async validateUserCredentials(
     username: string,

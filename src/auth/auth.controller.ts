@@ -28,7 +28,6 @@ import { RefreshAuthGuard } from './refresh.guard';
     @Post('login')
     @UseGuards(LocalAuthGuard)
     async login(@Req() req, @Res({ passthrough: true }) res: Response) {
-      //console.log(req);
       const token = await this.authService.getJwtToken(req.user as CurrentUser);
       const refreshToken = await this.authService.getRefreshToken(
         req.user.id,
