@@ -59,6 +59,8 @@ docker ps
 ### Инсталлируем базы
 ```bash
 npx prisma migrate dev --name init
+# Заполняем демо данными (пароли Alice and Bob - 12345)
+npx prisma db seed
 # Проверяем создание баз через браузер (http://localhost:5555)
 cd prisma
 npx prisma studio

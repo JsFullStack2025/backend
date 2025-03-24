@@ -2,23 +2,113 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as argon2 from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { CurrentUser } from './CurrentUser';
+
+import * as randomToken from 'rand-token';
+import * as moment from 'moment';
+import { UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
+import { use } from 'passport';
+
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+    constructor(
+        private usersService: UsersService,
+        private jwtService: JwtService
+      ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    // TODO: раскомментировать в проде для хэшированных паролей
-    if (user) {
-      //const passwordIsMatch  = await argon2.verify(user.hash, pass);
-      const passwordIsMatch  = user.hash == pass;
-      if(passwordIsMatch)
-      {
-        const { hash, ...result } = user;
-        return result;
-      }
-      throw new UnauthorizedException('Имя пользователя или пароль не совпадают');
+  private async getPasswordHash(password: string): Promise<string> {
+    return await argon2.hash(password);
+  }
+  private async checkPasswordHash(password: string, hash:string) {
+    return await argon2.verify(hash, password);
+  }
+//   public async registerUser(
+//     regModel: RegistrationReqModel,
+//   ): Promise<RegistrationRespModel> {
+//     let result = new RegistrationRespModel();
+
+//     const errorMessage = await this.registrationValidation(regModel);
+//     if (errorMessage) {
+//       result.message = errorMessage;
+//       result.successStatus = false;
+
+//       return result;
+//     }
+
+//     let newUser = new User();
+//     newUser.firstName = regModel.firstName;
+//     newUser.lastName = regModel.lastName;
+//     newUser.email = regModel.email;
+//     newUser.password = await this.getPasswordHash(regModel.password);
+
+//     await this.user.insert(newUser);
+//     result.successStatus = true;
+//     result.message = 'succeess';
+//     return result;
+//   }
+
+  public async validateUserCredentials(
+    username: string,
+    password: string,
+  ): Promise<CurrentUser | null> {
+    let user = await this.usersService.findOne(username);
+
+    if (user == null) {
+      return null;
     }
-    return null;
+
+    const isValidPassword = await this.checkPasswordHash(password, user.password);
+    if (!isValidPassword) {
+      return null;
+    }
+
+    let currentUser = new CurrentUser();
+    currentUser.id = user.id;
+    currentUser.username =  user.username;
+
+    return currentUser;
+  }
+
+  public async getJwtToken(user: CurrentUser): Promise<string> {
+    const payload = {
+      ...user,
+    };
+    return this.jwtService.signAsync(payload);
+  }
+
+  public async getRefreshToken(userId: number): Promise<string> {
+    const userDataToUpdate:UpdateUserTokenDto = {
+        id: userId,
+        refreshToken: randomToken.generate(16),
+        refreshTokenExp: moment().day(1).toDate(),
+    };
+
+    await this.usersService.updateUserToken(userDataToUpdate);
+    return userDataToUpdate.refreshToken;
+  }
+
+  public async validRefreshToken(
+    username: string,
+    refreshToken: string,
+  ): Promise<CurrentUser | null> {
+    const currentDate = moment().day(1).toDate();
+    let user = await this.usersService.findAny({
+      where: {
+        username: username,
+        refreshToken: refreshToken,
+        refreshTokenExp: currentDate,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    let currentUser = new CurrentUser();
+    currentUser.id = user.id;
+    currentUser.username = user.username;
+
+    return currentUser;
   }
 }

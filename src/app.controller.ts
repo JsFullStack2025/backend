@@ -7,7 +7,8 @@ import { CreateUsersDto, UpdateUserDto } from './Entities/Users.dto';
 import { CreateCardDto, UpdateCardDto } from './Entities/Cards.dto';
 import { IResponseResult } from './Entities/IResponseResult';
 import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
-import { LocalAuthGuard } from './auth/local-auth.guard';
+//import { LocalAuthGuard } from './auth/';
+import { Console } from 'console';
 
 @Controller()
 export class AppController {
@@ -15,7 +16,7 @@ export class AppController {
     private readonly appService: AppService,
     private readonly userService: UsersService,
     private readonly cardsService: CardsService
-  ) {} 
+  ) {}
 
   @ApiOkResponse({ type: IResponseResult<string>, description: 'Test method' })
   @Get()

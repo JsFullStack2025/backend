@@ -9,9 +9,13 @@ datasource db {
 
 model Users {
   id          Int      @id @default(autoincrement())
-  email       String   @unique
-  login       String   @unique
-  hash        String //@map("password_hash")
+  email       String?   @unique
+  username    String   @unique
+  password    String
+  accessToken String?
+  accessTokenExp DateTime?
+  refreshToken String?
+  refreshTokenExp DateTime?
   isAdmin     Boolean @default(false)
   first_name  String?
   middle_name String?
@@ -28,6 +32,7 @@ model Cards {
   authorId          Int?
   cardData          String?
   shared            Boolean    @default(false)
+  sharedUrl         String?
   designPrototype   CardTypes? @relation(fields: [designPrototypeId], references: [id])
   designPrototypeId Int?
 }

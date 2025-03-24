@@ -8,8 +8,8 @@ async function main() {
     create: {
       email: 'alice@prisma.io',
       first_name: 'Alice',
-      login: 'alice',
-      hash: '12345',
+      username: 'alice',
+      password: '$argon2id$v=19$m=65536,t=3,p=4$D2giyw8P9397nYpPYxJm2g$ft/F0KEZ8u+EgOWyCyHoI5LE41yDxzso7eI3tNvFLPI',
       Cards: {
         create: [
             {
@@ -17,7 +17,7 @@ async function main() {
               shared: true,
             },
             {
-                cardData: '{"firstname": "Alice", "email": "alice@prisma.io"}',
+              cardData: '{"firstname": "Alice", "email": "alice@prisma.io"}',
               shared: true,
             },
           ],
@@ -30,8 +30,8 @@ async function main() {
     create: {
       email: 'bob@prisma.io',
       first_name: 'Bob',
-      login: 'bob',
-      hash: '12345'
+      username: 'bob',
+      password: '$argon2id$v=19$m=65536,t=3,p=4$D2giyw8P9397nYpPYxJm2g$ft/F0KEZ8u+EgOWyCyHoI5LE41yDxzso7eI3tNvFLPI'
     },
   })
   console.log({ alice, bob })
