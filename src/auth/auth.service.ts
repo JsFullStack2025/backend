@@ -61,7 +61,7 @@ export class AuthService {
         refreshTokenExp: moment().day(1).toDate(),
     };
 
-    await this.usersService.updateUserToken(userDataToUpdate);
+    await this.usersService.updateUserRefreshToken(userDataToUpdate);
     return userDataToUpdate.refreshToken;
   }
 

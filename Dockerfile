@@ -1,8 +1,8 @@
 FROM node:alpine
 WORKDIR /opt/app
-COPY package.json .
-RUN npm install
+COPY yarn.lock .
+RUN yarn install
 COPY . .
 RUN npx prisma generate
 EXPOSE 3000
-CMD ["npm","start" ]
+CMD ["yarn","start" ]
