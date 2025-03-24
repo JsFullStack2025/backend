@@ -3,7 +3,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
-import { CurrentUser } from './CurrentUser';
+import { JwtPayload } from './jwt.payload';
 
 import * as randomToken from 'rand-token';
 import * as moment from 'moment';
@@ -28,7 +28,7 @@ export class AuthService {
   public async validateUserCredentials(
     username: string,
     password: string,
-  ): Promise<CurrentUser | null> {
+  ): Promise<JwtPayload | null> {
     let user = await this.usersService.findOne(username);
 
     if (user == null) {
@@ -40,14 +40,14 @@ export class AuthService {
       return null;
     }
 
-    let currentUser = new CurrentUser();
+    let currentUser = new JwtPayload();
     currentUser.id = user.id;
     currentUser.username =  user.username;
-
+    currentUser.isAdmin = user.isAdmin;
     return currentUser;
   }
 
-  public async getJwtToken(user: CurrentUser): Promise<string> {
+  public async getJwtToken(user: JwtPayload): Promise<string> {
     const payload = {
       ...user,
     };
@@ -68,13 +68,15 @@ export class AuthService {
   public async validRefreshToken(
     username: string,
     refreshToken: string,
-  ): Promise<CurrentUser | null> {
+  ): Promise<JwtPayload | null> {
     const currentDate = moment().day(1).toDate();
     let user = await this.usersService.findAny({
       where: {
         username: username,
         refreshToken: refreshToken,
-        refreshTokenExp: currentDate,
+        refreshTokenExp: {
+            gte: currentDate // TODO: проверить! или gte: new Date()
+          },
       },
     });
 
@@ -82,10 +84,10 @@ export class AuthService {
       return null;
     }
 
-    let currentUser = new CurrentUser();
+    let currentUser = new JwtPayload();
     currentUser.id = user.id;
     currentUser.username = user.username;
-
+    currentUser.isAdmin = user.isAdmin;
     return currentUser;
   }
 }

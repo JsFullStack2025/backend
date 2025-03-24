@@ -5,10 +5,10 @@ export class CreateCardDto {
     authorId: number;
 
     @ApiProperty({ description: "cardData в формате json", nullable: true })
-    cardData: string;
+    cardData?: string;
 
     @ApiProperty({ description: "Признак что карточка опубликована", nullable: true, default: false})
-    shared: boolean | undefined
+    shared?: boolean | undefined
 }
 
 export class UpdateCardDto extends CreateCardDto {

@@ -7,11 +7,10 @@ import {
     Res,
     UseGuards,
   } from '@nestjs/common';
-  import { AuthGuard } from '@nestjs/passport';
-  import { Response } from 'express';
-  import { CurrentUser } from './CurrentUser';
-  //import { RegistrationReqModel } from 'src/models/registration.req.model';
-  import { AuthService } from './auth.service';
+import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
+import { JwtPayload } from './jwt.payload';
+import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local.guard';
 import { JwtAuthGuard } from './jwt.guard';
 import { RefreshAuthGuard } from './refresh.guard';
@@ -28,10 +27,8 @@ import { RefreshAuthGuard } from './refresh.guard';
     @Post('login')
     @UseGuards(LocalAuthGuard)
     async login(@Req() req, @Res({ passthrough: true }) res: Response) {
-      const token = await this.authService.getJwtToken(req.user as CurrentUser);
-      const refreshToken = await this.authService.getRefreshToken(
-        req.user.id,
-      );
+      const token = await this.authService.getJwtToken(req.user as JwtPayload);
+      const refreshToken = await this.authService.getRefreshToken(req.user.id);
       const secretData = {
         token,
         refreshToken,
@@ -46,14 +43,14 @@ import { RefreshAuthGuard } from './refresh.guard';
     async movies(@Req() req) {
       return ['Ok', 'Work'];
     }
-  
+
     @Get('refresh-tokens')
     @UseGuards(RefreshAuthGuard)
     async regenerateTokens(
       @Req() req,
       @Res({ passthrough: true }) res: Response,
     ) {
-      const token = await this.authService.getJwtToken(req.user as CurrentUser);
+      const token = await this.authService.getJwtToken(req.user as JwtPayload);
       const refreshToken = await this.authService.getRefreshToken(
         req.user.id,
       );

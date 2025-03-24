@@ -16,13 +16,19 @@ export class CreateUsersDto {
     email?: string;
 }
 
-export class UpdateUserDto extends CreateUsersDto {
-    @ApiProperty({ description: "id пользователя", nullable: true })
+export class UpdateUserDto {
+    @ApiProperty({ description: "id пользователя", nullable: false })
     @IsNotEmpty({ message: 'Не заполнен id пользователя' })
     id: number;
+    first_name?:string;
+    middle_name?:string;
+    last_name?:string;
+    email?:string;
 }
 
 export class UpdateUserTokenDto {
+    @ApiProperty({ description: "id пользователя", nullable: false })
+    @IsNotEmpty({ message: 'Не заполнен id пользователя' })
     id: number;
     refreshToken: string;
     refreshTokenExp: Date;

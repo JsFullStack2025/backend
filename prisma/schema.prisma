@@ -12,8 +12,6 @@ model Users {
   email       String?   @unique
   username    String   @unique
   password    String
-  accessToken String?
-  accessTokenExp DateTime?
   refreshToken String?
   refreshTokenExp DateTime?
   isAdmin     Boolean @default(false)
