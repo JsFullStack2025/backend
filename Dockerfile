@@ -1,6 +1,6 @@
 FROM node:alpine
 WORKDIR /opt/app
-COPY yarn.lock .
+COPY package*.json yarn.lock ./
 RUN yarn install
 COPY . .
 RUN npx prisma generate
