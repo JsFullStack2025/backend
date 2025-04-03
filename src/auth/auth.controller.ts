@@ -33,15 +33,19 @@ import { RefreshAuthGuard } from './refresh.guard';
         token,
         refreshToken,
       };
-
-      res.cookie('auth-cookie', secretData, { httpOnly: true });
-      return  {msg:'success'};
+      res.cookie('auth-cookie', secretData, { 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Только для production 
+        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+        maxAge: 3600000,
+      });
+      return  {msg:'success', user: req.user};
     }
   
     @Get('testjwt')
     @UseGuards(JwtAuthGuard)
     async movies(@Req() req) {
-      return ['Ok', 'Work'];
+      return {Work: 'Ok', user: req.user};
     }
 
     @Get('refresh-tokens')
