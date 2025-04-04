@@ -1,3 +1,50 @@
 Table Users {
-    id sertial [primary key]
+    id serial [primary key]
+    email varchar [unique]
+    username varchar [unique]
+    password varchar
+    refreshToken varchar
+    refreshTokenExp timestamp
+    isAdmin boolean [default: false]
+    first_name varchar
+    middle_name varchar
+    last_name varchar
+    created_at timestamp
+    updated_at timestamp
+    banned boolean [default: false]
 }
+
+Table Cards {
+    id serial [primary key]
+    authorId integer
+    cardData varchar
+    shared boolean [default: false]
+    sharedUrl varchar
+    designPrototypeId integer
+}
+
+Table CardTypes {
+  id serial [primary key]
+  title varchar
+  description varchar
+  designData varchar
+}
+
+Table Projects {
+    id serial [primary key]
+    title varchar
+    description varchar
+    imgUrl varchar
+}
+
+Table ProjectMembers {
+    id serial [primary key]
+    projectId integer
+    userId integer
+    userRoleInProject varchar
+}
+
+Ref: Cards.authorId > Users.id
+Ref: Cards.designPrototypeId > CardTypes.id
+Ref: ProjectMembers.projectId > Projects.id
+Ref: ProjectMembers.userId > Users.id
