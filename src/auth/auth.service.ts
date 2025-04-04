@@ -75,7 +75,7 @@ export class AuthService {
         username: username,
         refreshToken: refreshToken,
         refreshTokenExp: {
-            gte: currentDate // TODO: проверить! или gte: new Date()
+            gte: currentDate
           },
       },
     });

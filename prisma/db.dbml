@@ -1,0 +1,3 @@
+Table Users {
+    id sertial [primary key]
+}

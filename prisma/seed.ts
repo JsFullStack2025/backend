@@ -31,7 +31,8 @@ async function main() {
       email: 'bob@prisma.io',
       first_name: 'Bob',
       username: 'bob',
-      password: '$argon2id$v=19$m=65536,t=3,p=4$D2giyw8P9397nYpPYxJm2g$ft/F0KEZ8u+EgOWyCyHoI5LE41yDxzso7eI3tNvFLPI'
+      password: '$argon2id$v=19$m=65536,t=3,p=4$D2giyw8P9397nYpPYxJm2g$ft/F0KEZ8u+EgOWyCyHoI5LE41yDxzso7eI3tNvFLPI',
+      isAdmin: true
     },
   })
   console.log({ alice, bob })
