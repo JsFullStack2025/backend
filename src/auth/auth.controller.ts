@@ -36,8 +36,8 @@ import { RefreshAuthGuard } from './refresh.guard';
       res.cookie('auth-cookie', secretData, { 
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Только для production 
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-        maxAge: 3600000,
+        sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
+        maxAge: 60000,
       });
       return  {msg:'success', user: req.user};
     }
