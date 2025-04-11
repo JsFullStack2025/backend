@@ -11,6 +11,8 @@ export class UserGuard implements CanActivate {
     const userId = request.params.id;  // Пользователь из URL
 
     // Простая проверка: пользователь может получить только свои данные
+    console.log(user.id);
+    console.log(userId);
     return user && user.id === +userId;
   }
 }
