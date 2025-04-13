@@ -7,6 +7,8 @@ import { CreateUsersDto, UpdateUserDto } from './Entities/Users.dto';
 import { CreateCardDto, UpdateCardDto } from './Entities/Cards.dto';
 import { IResponseResult } from './Entities/IResponseResult';
 import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from './auth/jwt.guard';
+import { UserGuard, AdminGuard } from './auth/roles.guard';
 //import { LocalAuthGuard } from './auth/';
 import { Console } from 'console';
 
@@ -20,6 +22,7 @@ export class AppController {
 
   @ApiOkResponse({ type: IResponseResult<string>, description: 'Test method' })
   @Get()
+  @UseGuards(JwtAuthGuard)
   getHello(): IResponseResult<string> {
     const result: IResponseResult<string>  = { success : true, value: this.appService.getHello()};
     return result;
@@ -32,6 +35,7 @@ export class AppController {
   }
 
   @Get('user:id')
+  @UseGuards(JwtAuthGuard, UserGuard)
   @ApiOkResponse({ type: Promise<Users>, description: 'Get user by ID' })
   @ApiOkResponse({type: Promise<Users | null>})
   async getUserById(@Param('id',ParseIntPipe) id: number) : Promise<Users | null> {
@@ -49,6 +53,7 @@ export class AppController {
   }
 
   @Patch('user')
+  @UseGuards(JwtAuthGuard, UserGuard)
   @ApiOkResponse({ type: Promise<Users>, description: 'Update user' })
   async patchUser (
     @Body() userData : UpdateUserDto
@@ -60,6 +65,7 @@ export class AppController {
   }
 
   @Delete('user:id')
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOkResponse({ type: Promise<Users[]>, description: 'Delete user' })
   @ApiNotFoundResponse({ })
   async removeUser(@Param('id',ParseIntPipe) id: number) {
