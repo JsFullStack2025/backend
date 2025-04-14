@@ -7,13 +7,14 @@ export class CreateCardDto {
     @ApiProperty({ description: "cardData в формате json", nullable: true })
     cardData?: string;
 
+    @ApiProperty({ description: "ID прототипа карточки", nullable: true })
+    designPrototypeId?: number;
+
     @ApiProperty({ description: "Признак что карточка опубликована", nullable: true, default: false})
     shared?: boolean | undefined
 }
 
-export class UpdateCardDto {
+export class UpdateCardDto extends CreateCardDto {
     @ApiProperty({ description: "id карточки", nullable: false })
     id: number;
-    cardData?: string;
-    shared?: boolean | undefined
 }

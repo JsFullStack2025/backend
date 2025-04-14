@@ -10,7 +10,7 @@ datasource db {
 
 model Users {
   id          Int      @id @default(autoincrement())
-  email       String   @unique
+  email       String?   @unique
   username    String   @unique
   password    String
   refreshToken String?
@@ -38,6 +38,8 @@ model Cards {
 
 model CardTypes {
   id         Int     @id @default(autoincrement())
-  designData String
+  title      String
+  description String?
+  designData String?
   Cards      Cards[]
 }
