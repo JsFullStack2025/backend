@@ -29,7 +29,7 @@ export class AppController {
     return result;
   }
 
-// TODO: USERS API
+  // TODO: USERS API
   @Get('user')
   @ApiOkResponse({ type: Promise<Users[]>, description: 'Get all users' })
   async getUsers() : Promise<Users[]> {
