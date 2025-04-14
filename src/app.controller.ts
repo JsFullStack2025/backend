@@ -155,10 +155,11 @@ export class AppController {
   }
 
   @Delete('cardtypes:id')
-  @ApiOkResponse({ type: Promise<CardTypes>, description: 'Delete card' })
+  @ApiOkResponse({ type: Promise<CardTypes>, description: 'Delete card type' })
   async removeCardtype(@Param('id',ParseIntPipe) id: number) {
     const card = await this.cardTypesService.cardTypeById(id);
     if(!card) throw new NotFoundException(`Card type с Id=${id} не найден`);
+    if(card.readonly ) throw new NotFoundException(`Card type с Id=${id} только для чтения, удалять нельзя`);
     const result = this.cardTypesService.deleteCardType(id);
     return result;
   }

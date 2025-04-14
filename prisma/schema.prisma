@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  //output = "../generated/prisma_client"
 }
 
 datasource db {
@@ -41,5 +40,7 @@ model CardTypes {
   title      String
   description String?
   designData String?
+  isCustomTemplate Boolean @default(false)
+  readonly Boolean @default(false)
   Cards      Cards[]
 }
