@@ -1,23 +1,24 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, NotFoundException, UseGuards, Request } from '@nestjs/common';
 import { AppService } from './app.service';
 import { UsersService } from './users/users.service'
-import { Cards, Prisma, Users } from '@prisma/client';
+import { Cards, CardTypes, Users } from '@prisma/client';
 import { CardsService } from './services/cards.service';
+import { CardTypesService } from "./services/cardTypes.service";
 import { CreateUsersDto, UpdateUserDto } from './Entities/Users.dto';
 import { CreateCardDto, UpdateCardDto } from './Entities/Cards.dto';
 import { IResponseResult } from './Entities/IResponseResult';
 import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from './auth/jwt.guard';
 import { UserGuard, AdminGuard } from './auth/roles.guard';
-//import { LocalAuthGuard } from './auth/';
-import { Console } from 'console';
+import { CreateCardTypeDto, UpdateCardTypeDto } from './Entities/CardDesign.dto';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly userService: UsersService,
-    private readonly cardsService: CardsService
+    private readonly cardsService: CardsService,
+    private readonly cardTypesService: CardTypesService
   ) {}
 
   @ApiOkResponse({ type: IResponseResult<string>, description: 'Test method' })
@@ -28,6 +29,7 @@ export class AppController {
     return result;
   }
 
+// TODO: USERS API
   @Get('user')
   @ApiOkResponse({ type: Promise<Users[]>, description: 'Get all users' })
   async getUsers() : Promise<Users[]> {
@@ -75,19 +77,21 @@ export class AppController {
     return result;
   }
 
+  // TODO: CARDS API
   @Get('cards')
   @ApiOkResponse({ type: Promise<Cards[]>, description: 'Get all cards' })
   async getCards(): Promise<Cards[] | null> {
     return this.cardsService.cards();
   }
+
   @Get('cards:id')
-  @ApiOkResponse({ type: Promise<Cards>, description: 'Get card by ID' })
-  @ApiOkResponse({type: Promise<Cards | null>})
+  @ApiOkResponse({ type: Promise<Cards | null>, description: 'Get card by ID' })
   async getCardById(@Param('id',ParseIntPipe) id: number) : Promise<Cards | null> {
     const result = await this.cardsService.cardById(id);
     if(!result) throw new NotFoundException(`Card с Id=${id} не найдена`);
     return result;
   }
+
   @Post('cards')
   @ApiOkResponse({ type: Promise<Cards>, description: 'Create card' })
   async createCard(
@@ -113,6 +117,49 @@ export class AppController {
     const card = await this.cardsService.cardById(id);
     if(!card) throw new NotFoundException(`Card с Id=${id} не найден`);
     const result = this.cardsService.deleteCard(id);
+    return result;
+  }
+
+  // TODO: CARDTYPES API
+  @Get('cardtypes')
+  @ApiOkResponse({ type: Promise<CardTypes[]>, description: 'Get all card types' })
+  async getCardTypes(): Promise<CardTypes[] | null> {
+    return this.cardTypesService.cardsTypes();
+  }
+
+  @Get('cardtypes:id')
+  @ApiOkResponse({ type: Promise<CardTypes | null>, description: 'Get cardtypes by ID' })
+  async getCardTypesById(@Param('id',ParseIntPipe) id: number) : Promise<CardTypes | null> {
+    const result = await this.cardTypesService.cardTypeById(id);
+    if(!result) throw new NotFoundException(`Card с Id=${id} не найдена`);
+    return result;
+  }
+
+  @Post('cardtypes')
+  @ApiOkResponse({ type: Promise<CardTypes>, description: 'Create card' })
+  async createCardType(
+    @Body() cardData: CreateCardTypeDto
+  ) : Promise<CardTypes> {
+    return this.cardTypesService.createCardDType(cardData);
+  }
+
+  @Patch('cardtypes')
+  @ApiOkResponse({ type: Promise<CardTypes>, description: 'Update card type' })
+  async patchCardType (
+  @Body() cardData : UpdateCardTypeDto
+  ) : Promise<CardTypes> {
+    const card = await this.cardsService.cardById(cardData.id);
+    if(!card) throw new NotFoundException(`Card с Id=${cardData.id} не найден`);
+    const result = this.cardTypesService.updateCardType(cardData);
+    return result;
+  }
+
+  @Delete('cardtypes:id')
+  @ApiOkResponse({ type: Promise<CardTypes>, description: 'Delete card' })
+  async removeCardtype(@Param('id',ParseIntPipe) id: number) {
+    const card = await this.cardTypesService.cardTypeById(id);
+    if(!card) throw new NotFoundException(`Card type с Id=${id} не найден`);
+    const result = this.cardTypesService.deleteCardType(id);
     return result;
   }
 }

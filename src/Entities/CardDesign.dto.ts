@@ -12,7 +12,7 @@ export class CreateCardTypeDto {
     designData?: string;
 }
 
-export class UpdateCardDesignDto extends CreateCardTypeDto {
+export class UpdateCardTypeDto extends CreateCardTypeDto {
     @ApiProperty({ description: "id карточки", nullable: false })
     id: number;
 }

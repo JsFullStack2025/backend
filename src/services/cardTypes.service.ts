@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { CardTypes } from '@prisma/client'
-import { CreateCardTypeDto } from '@/Entities/CardDesign.dto';
+import { CreateCardTypeDto, UpdateCardDesignDto } from '@/Entities/CardDesign.dto';
 
 @Injectable()
-export class CardsTypesService {
+export class CardTypesService {
   constructor(private prisma: PrismaService) {}
 
   async cardsTypes(): Promise<CardTypes[] | null> {
@@ -17,5 +17,22 @@ export class CardsTypesService {
     });
   }
 
+async cardTypeById(userid:number): Promise<CardTypes | null> {
+      return this.prisma.cardTypes.findUnique({
+        where: {id:userid},
+      });
+    }
 
+  async updateCardType(carddata: UpdateCardDesignDto): Promise<CardTypes> {
+    return this.prisma.cardTypes.update({
+      where: { id:carddata.id },
+      data: carddata
+    });
+  }
+
+  async deleteCardType(cardid: number): Promise<CardTypes> {
+    return this.prisma.cardTypes.delete({
+      where: { id: cardid }
+    });
+  }
 }

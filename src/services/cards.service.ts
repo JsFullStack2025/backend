@@ -16,6 +16,7 @@ export class CardsService {
       data: carddata
     });
   }
+
   async cardById(userid:number): Promise<Cards | null> {
       return this.prisma.cards.findUnique({
         where: {id:userid},
@@ -28,6 +29,7 @@ export class CardsService {
       where: {id:carddata.id}
     });
   }
+
   async deleteCard(cardid: number): Promise<Cards> {
     return this.prisma.cards.delete({
       where: { id: cardid }
