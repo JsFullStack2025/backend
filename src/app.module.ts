@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersService} from './users/users.service';
 import { CardsService } from './services/cards.service';
+import { CardTypesService} from './services/cardTypes.service'
 import { PrismaService } from './services/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -16,6 +17,6 @@ import { AuthService } from './auth/auth.service';
     UsersModule,
     ],
   controllers: [AppController, AuthController],
-  providers: [AuthService, AppService, PrismaService, UsersService, CardsService],
+  providers: [AuthService, AppService, PrismaService, UsersService, CardsService, CardTypesService],
 })
 export class AppModule {}
