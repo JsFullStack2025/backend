@@ -26,14 +26,18 @@ export class AuthService {
   }
 
   public async validateUserCredentials(
-    username: string,
+    email: string,
     password: string,
   ): Promise<JwtPayload | null> {
-    let user = await this.usersService.findOne(username);
+    let user = await this.usersService.findOne(email);
+
+    console.log("usel null")
 
     if (user == null) {
+      console.log(email)
       return null;
     }
+    console.log(user)
 
     const isValidPassword = await this.checkPasswordHash(password, user.password);
     if (!isValidPassword) {
