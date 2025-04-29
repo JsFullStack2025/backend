@@ -31,7 +31,7 @@ export class AuthService {
   ): Promise<JwtPayload | null> {
     let user = await this.usersService.findOne(email);
 
-    console.log("usel null")
+    console.log(email)
 
     if (user == null) {
       console.log(email)
@@ -70,13 +70,13 @@ export class AuthService {
   }
 
   public async validRefreshToken(
-    username: string,
+    email: string,
     refreshToken: string,
   ): Promise<JwtPayload | null> {
     const currentDate = moment().day(1).toDate();
     let user = await this.usersService.findAny({
       where: {
-        username: username,
+        email: email,
         refreshToken: refreshToken,
         refreshTokenExp: {
             gte: currentDate

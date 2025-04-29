@@ -6,10 +6,10 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'http://localhost:3001', // Разрешаем только этот домен
+    origin: process.env.FRONTEND_URL, // Разрешаем только этот домен
     credentials: true, // Разрешаем передачу куки
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Разрешаем только эти методы
-    allowedHeaders: ['Content-Type'], // Разрешаем только этот заголовок
+    //allowedHeaders: ['Content-Type'], // Разрешаем только этот заголовок
     exposedHeaders: ['Set-Cookie'], // Разрешаем передачу куки
   });
   
