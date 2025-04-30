@@ -9,12 +9,14 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AuthController } from './auth/auth.controller'
 import { AuthService } from './auth/auth.service';
+//import { HttpModule } from '@nestjs/axios';
 //import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
+    //HttpModule,
     ],
   controllers: [AppController, AuthController],
   providers: [AuthService, AppService, PrismaService, UsersService, CardsService, CardTypesService],

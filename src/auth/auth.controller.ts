@@ -14,6 +14,8 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local.guard';
 import { JwtAuthGuard } from './jwt.guard';
 import { RefreshAuthGuard } from './refresh.guard';
+
+import { Recaptcha } from "@nestlab/google-recaptcha"
   
   @Controller('auth')
   export class AuthController {
@@ -24,9 +26,10 @@ import { RefreshAuthGuard } from './refresh.guard';
     //   return await this.authService.registerUser(reg);
     // }
 
+    @Recaptcha()
     @Post('login')
     @UseGuards(LocalAuthGuard)
-    async login(@Req() req, @Res({ passthrough: true }) res: Response) {
+    async login(@Req() req, @Body() body, @Res({ passthrough: true }) res: Response) {
       const token = await this.authService.getJwtToken(req.user as JwtPayload);
       const refreshToken = await this.authService.getRefreshToken(req.user.id);
       const secretData = {
