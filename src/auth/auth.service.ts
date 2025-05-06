@@ -12,16 +12,16 @@ import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private usersService: UsersService,
-        private jwtService: JwtService
-      ) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService
+  ) { }
 
   private async getPasswordHash(password: string): Promise<string> {
     return await argon2.hash(password);
   }
 
-  private async checkPasswordHash(password: string, hash:string) {
+  private async checkPasswordHash(password: string, hash: string) {
     return await argon2.verify(hash, password);
   }
 
@@ -34,7 +34,7 @@ export class AuthService {
     console.log(email)
 
     if (user == null) {
-      console.log(email)
+      //console.log(email)
       return null;
     }
     console.log(user)
@@ -46,7 +46,7 @@ export class AuthService {
 
     let currentUser = new JwtPayload();
     currentUser.id = user.id;
-    currentUser.username =  user.username;
+    currentUser.username = user.username;
     currentUser.isAdmin = user.isAdmin;
     return currentUser;
   }
@@ -59,10 +59,10 @@ export class AuthService {
   }
 
   public async getRefreshToken(userId: number): Promise<string> {
-    const userDataToUpdate:UpdateUserTokenDto = {
-        id: userId,
-        refreshToken: randomToken.generate(16),
-        refreshTokenExp: moment().day(1).toDate(),
+    const userDataToUpdate: UpdateUserTokenDto = {
+      id: userId,
+      refreshToken: randomToken.generate(16),
+      refreshTokenExp: moment().day(1).toDate(),
     };
 
     await this.usersService.updateUserRefreshToken(userDataToUpdate);
@@ -79,8 +79,8 @@ export class AuthService {
         email: email,
         refreshToken: refreshToken,
         refreshTokenExp: {
-            gte: currentDate
-          },
+          gte: currentDate
+        },
       },
     });
 
@@ -94,4 +94,27 @@ export class AuthService {
     currentUser.isAdmin = user.isAdmin;
     return currentUser;
   }
+
+  public async validateUser(profile: any): Promise<JwtPayload | null> {
+    let user = await this.usersService.findOne(profile.email);
+
+    console.log("finding user", profile)
+
+
+
+    if (!user) {
+      console.log("no user")
+      return null
+    }
+    else {
+      //console.log(user)
+      let currentUser = new JwtPayload();
+      currentUser.id = user.id;
+      currentUser.username = user.username;
+      currentUser.isAdmin = user.isAdmin;
+      console.log("currentUser",currentUser)
+      return currentUser;
+    }
+  }
+
 }

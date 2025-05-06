@@ -11,6 +11,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { RefreshStrategy } from './refresh.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { getRecaptchaConfig } from "@/config/recaptcha.config"
+import { GoogleOAuthStrategy } from './oauth.strategy';
 @Module({
   imports: [
     UsersModule,
@@ -26,6 +27,6 @@ import { getRecaptchaConfig } from "@/config/recaptcha.config"
 			inject: [ConfigService]
 		}),
     ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy, GoogleOAuthStrategy],
 })
 export class AuthModule {}

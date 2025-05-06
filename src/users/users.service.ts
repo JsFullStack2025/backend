@@ -50,6 +50,7 @@ export class UsersService {
   }
 
   async findOne(email: string): Promise<Users | undefined | null> {
+    console.log("email:", email)
     return this.prisma.users.findFirst({ where: { email: email }});
   }
   async findAny(params: any): Promise<Users | undefined | null> {

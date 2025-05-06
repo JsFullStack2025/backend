@@ -1,12 +1,12 @@
 import {
-    Body,
-    Controller,
-    Get,
-    Post,
-    Req,
-    Res,
-    UseGuards,
-  } from '@nestjs/common';
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { JwtPayload } from './jwt.payload';
@@ -16,57 +16,100 @@ import { JwtAuthGuard } from './jwt.guard';
 import { RefreshAuthGuard } from './refresh.guard';
 
 import { Recaptcha } from "@nestlab/google-recaptcha"
-  
-  @Controller('auth')
-  export class AuthController {
-    constructor(private authService: AuthService) {}
-  
-    // @Post('registration')
-    // async registerUser(@Body() reg: RegistrationReqModel) {
-    //   return await this.authService.registerUser(reg);
-    // }
+import { GoogleGuard } from './ouath.guard';
 
-    @Recaptcha()
-    @Post('login')
-    @UseGuards(LocalAuthGuard)
-    async login(@Req() req, @Body() body, @Res({ passthrough: true }) res: Response) {
-      const token = await this.authService.getJwtToken(req.user as JwtPayload);
-      const refreshToken = await this.authService.getRefreshToken(req.user.id);
-      const secretData = {
-        token,
-        refreshToken,
-      };
-      res.cookie('auth-cookie', secretData, { 
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Только для production 
-        sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
-        maxAge: 60000,
-      });
-      return  {msg:'success', user: req.user};
-    }
-  
-    @Get('testjwt')
-    @UseGuards(JwtAuthGuard)
-    async movies(@Req() req) {
-      return {Work: 'Ok', user: req.user};
-    }
 
-    @Get('refresh-tokens')
-    @UseGuards(RefreshAuthGuard)
-    async regenerateTokens(
-      @Req() req,
-      @Res({ passthrough: true }) res: Response,
-    ) {
-      const token = await this.authService.getJwtToken(req.user as JwtPayload);
-      const refreshToken = await this.authService.getRefreshToken(
-        req.user.id,
-      );
-      const secretData = {
-        token,
-        refreshToken,
-      };
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) { }
 
-      res.cookie('auth-cookie', secretData, { httpOnly: true });
-      return   {msg:'success'};
-    }
+  // @Post('registration')
+  // async registerUser(@Body() reg: RegistrationReqModel) {
+  //   return await this.authService.registerUser(reg);
+  // }
+
+  @Recaptcha()
+  @Post('login')
+  @UseGuards(LocalAuthGuard)
+  async login(@Req() req, @Body() body, @Res({ passthrough: true }) res: Response) {
+    const token = await this.authService.getJwtToken(req.user as JwtPayload);
+    const refreshToken = await this.authService.getRefreshToken(req.user.id);
+    const secretData = {
+      token,
+      refreshToken,
+    };
+    res.cookie('auth-cookie', secretData, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Только для production 
+      sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
+      maxAge: 60000,
+    });
+
+    return { msg: 'success', user: req.user };
   }
+
+  @Get('testjwt')
+  @UseGuards(JwtAuthGuard)
+  async movies(@Req() req) {
+    return { Work: 'Ok', user: req.user };
+  }
+
+  @Get('refresh-tokens')
+  @UseGuards(RefreshAuthGuard)
+  async regenerateTokens(
+    @Req() req,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = await this.authService.getJwtToken(req.user as JwtPayload);
+    const refreshToken = await this.authService.getRefreshToken(
+      req.user.id,
+    );
+    const secretData = {
+      token,
+      refreshToken,
+    };
+
+    res.cookie('auth-cookie', secretData, { httpOnly: true });
+    return { msg: 'success' };
+  }
+
+  @Get('google')
+  @UseGuards(GoogleGuard)
+  googleAuth() { }
+
+  @Get('google/callback')
+  @UseGuards(GoogleGuard)
+  async googleAuthRedirect(@Res() res: Response) {
+
+    if (res.statusCode === 200) {
+      console.log("resOk");
+      //console.log(res);
+      const user = await this.authService.validateUser(res.req.user);
+
+      if (user) {
+        const token = await this.authService.getJwtToken(user as JwtPayload);
+        const refreshToken = await this.authService.getRefreshToken(user.id);
+        const secretData = {
+          token,
+          refreshToken,
+        };
+        res.cookie('auth-cookie', secretData, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Только для production 
+          sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
+          maxAge: 60000,
+        });
+      }
+
+
+      res.redirect(process.env.FRONTEND_URL as string);
+      console.log('redirect is working')
+      return user
+    }
+    else console.log("res.code", res.statusCode)
+    res.redirect(process.env.FRONTEND_URL as string);
+  }
+}
+
+
+

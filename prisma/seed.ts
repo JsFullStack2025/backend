@@ -82,6 +82,45 @@ async function main() {
     },
   });
   console.log({ alice, bob })
+
+  const oleg = await prisma.users.upsert({
+    where: { email: 'kulik.ol.val@gmail.com' },
+    update: {},
+    create: {
+      email: 'kulik.ol.val@gmail.com',
+      first_name: 'Oleg',
+      username: 'oleg',
+      password: '$argon2id$v=19$m=65536,t=3,p=4$D2giyw8P9397nYpPYxJm2g$ft/F0KEZ8u+EgOWyCyHoI5LE41yDxzso7eI3tNvFLPI',
+      Cards: {
+        create: [
+            {
+              cardData: '{"firstname": "Oleg", "email": "kulik.ol.val@gmail.com"}',
+              shared: true,
+              designPrototype: {
+                create: {
+                  title: "Шаблон 6",
+                  description: "Описание шаблона 6",
+                  designData: '{"bgImgUrl": "image4.jpg", "designData":""}'
+                }
+              }
+            },
+            {
+              cardData: '{"firstname": "Oleg", "email": "kulik.ol.val@gmail.com"}',
+              shared: true,
+              designPrototype: {
+                create: {
+                  title: "Шаблон 7",
+                  description: "Описание шаблона 7",
+                  designData: '{"bgImgUrl": "image5.jpg", "designData":""}'
+                }
+              }
+            },
+          ],
+        }
+    },
+  })
+
+
 }
 
 main()
