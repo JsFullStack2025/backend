@@ -102,12 +102,12 @@ export class AuthController {
       }
 
 
-      res.redirect(process.env.FRONTEND_URL as string);
+      res.redirect(process.env.CLIENT as string);
       console.log('redirect is working')
-      return user
+      return { msg: 'success', user: user };
     }
     else console.log("res.code", res.statusCode)
-    res.redirect(process.env.FRONTEND_URL as string);
+    res.redirect(process.env.CLIENT as string);
   }
 }
 
