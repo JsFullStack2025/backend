@@ -30,21 +30,23 @@ import { RefreshAuthGuard } from './refresh.guard';
       const token = await this.authService.getJwtToken(req.user as JwtPayload);
       const refreshToken = await this.authService.getRefreshToken(req.user.id);
       const secretData = {
+        userId: req.user.id,
+        userName: req.user.username,
         token,
         refreshToken,
       };
-      res.cookie('auth-cookie', secretData, { 
-        httpOnly: true,
+      res.cookie('auth-cookie', secretData, {
+        //httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Только для production 
         sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
-        maxAge: 60000,
+        maxAge: 60000*30,
       });
       return  {msg:'success', user: req.user};
     }
-  
+
     @Get('testjwt')
     @UseGuards(JwtAuthGuard)
-    async movies(@Req() req) {
+    async testjwt(@Req() req) {
       return {Work: 'Ok', user: req.user};
     }
 

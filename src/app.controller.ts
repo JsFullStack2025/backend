@@ -148,10 +148,9 @@ export class AppController {
   async patchCardType (
   @Body() cardData : UpdateCardTypeDto
   ) : Promise<CardTypes> {
-    const card = await this.cardsService.cardById(cardData.id);
-    if(!card) throw new NotFoundException(`Card с Id=${cardData.id} не найден`);
-    const result = this.cardTypesService.updateCardType(cardData);
-    return result;
+    const card = await this.cardTypesService.cardTypeById(cardData.id);
+    if(!card) throw new NotFoundException(`Card type с Id=${cardData.id} не найден`);
+    return this.cardTypesService.updateCardType(cardData);
   }
 
   @Delete('cardtypes:id')
@@ -160,7 +159,6 @@ export class AppController {
     const card = await this.cardTypesService.cardTypeById(id);
     if(!card) throw new NotFoundException(`Card type с Id=${id} не найден`);
     if(card.readonly ) throw new NotFoundException(`Card type с Id=${id} только для чтения, удалять нельзя`);
-    const result = this.cardTypesService.deleteCardType(id);
-    return result;
+    return this.cardTypesService.deleteCardType(id);
   }
 }
