@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { JwtPayload } from './jwt.payload';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local.guard';
@@ -17,6 +17,8 @@ import { RefreshAuthGuard } from './refresh.guard';
 
 import { Recaptcha } from "@nestlab/google-recaptcha"
 import { GoogleGuard } from './ouath.guard';
+
+
 
 
 @Controller('auth')
@@ -79,7 +81,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleGuard)
-  async googleAuthRedirect(@Res() res: Response) {
+  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
 
     if (res.statusCode === 200) {
       console.log("resOk");
@@ -99,9 +101,12 @@ export class AuthController {
           sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
           maxAge: 60000,
         });
+        req.session.user = req.user as {
+          email: string;
+          name: string;
+          photo?: string | undefined;
+        };
       }
-
-
       res.redirect(process.env.CLIENT as string);
       console.log('redirect is working')
       return { msg: 'success', user: user };
@@ -109,6 +114,16 @@ export class AuthController {
     else console.log("res.code", res.statusCode)
     res.redirect(process.env.CLIENT as string);
   }
+
+  @Get('session')
+  getSession(@Req() req: Request, @Res() res: Response) {
+    if (req.session && req.session.user) {
+      return res.json({ user: req.session.user });
+    } else {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+  }
+
 }
 
 
