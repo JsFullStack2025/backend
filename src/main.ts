@@ -6,7 +6,7 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'http://localhost:3001', // Разрешаем только этот домен
+    origin: 'http://localhost:3000', // Разрешаем только этот домен
     credentials: true, // Разрешаем передачу куки
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Разрешаем только эти методы
     allowedHeaders: ['Content-Type'], // Разрешаем только этот заголовок
