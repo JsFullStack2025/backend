@@ -13,6 +13,7 @@ model Users {
   foto         String?
   email       String?   @unique
   username    String   @unique
+  fio         String?
   password    String
   refreshToken String?
   refreshTokenExp DateTime?

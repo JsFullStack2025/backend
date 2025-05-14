@@ -14,7 +14,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local.guard';
 import { JwtAuthGuard } from './jwt.guard';
 import { RefreshAuthGuard } from './refresh.guard';
-  
+
   @Controller('auth')
   export class AuthController {
     constructor(private authService: AuthService) {}
