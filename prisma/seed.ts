@@ -42,6 +42,7 @@ async function main() {
       Cards: {
         create: [
             {
+              title: "Моя первая визитка",
               cardData: '{"firstname": "Alice", "email": "alice@prisma.io"}',
               shared: true,
               designPrototype: {
@@ -53,6 +54,7 @@ async function main() {
               }
             },
             {
+              title: "Моя вторая визитка",
               cardData: '{"firstname": "Alice", "email": "alice@prisma.io"}',
               shared: true,
               designPrototype: {
