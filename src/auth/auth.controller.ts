@@ -8,7 +8,7 @@ import {
     UseGuards,
   } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+import { response, Response } from 'express';
 import { JwtPayload } from './jwt.payload';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local.guard';
@@ -39,11 +39,19 @@ import { UsersService} from  '@/users/users.service'
       };
       res.cookie('auth-cookie', secretData, {
         //httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Только для production 
+        secure: process.env.NODE_ENV === 'production', // Только для production
         sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
         maxAge: 60000*30,
       });
       return  {msg:'success', user: req.user};
+    }
+
+    @Post('logout')
+    @UseGuards(JwtAuthGuard)
+    async logout()
+    {
+      response.clearCookie('auth-cookie');
+      return {}
     }
 
     @Get('testjwt')
