@@ -20,6 +20,8 @@ export class UpdateUserDto {
     @ApiProperty({ description: "id пользователя", nullable: false })
     @IsNotEmpty({ message: 'Не заполнен id пользователя' })
     id: number;
+    fio?: string;
+    foto?: string;
     first_name?:string;
     middle_name?:string;
     last_name?:string;

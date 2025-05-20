@@ -55,7 +55,7 @@ export class AppController {
   }
 
   @Patch('user')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  // @UseGuards(JwtAuthGuard, UserGuard)
   @ApiOkResponse({ type: Promise<Users>, description: 'Update user' })
   async patchUser (
     @Body() userData : UpdateUserDto
@@ -76,7 +76,15 @@ export class AppController {
     const result = this.userService.deleteUser(id);
     return result;
   }
-
+ @Get('user:id/cards')
+  @UseGuards(JwtAuthGuard, UserGuard)
+  @ApiOkResponse({ type: Promise<Users>, description: 'Get user cards' })
+  @ApiOkResponse({type: Promise<Users | null>})
+  async getUserCards(@Param('id',ParseIntPipe) idUser: number) : Promise<Cards[]| null> {
+    const result = await this.userService.getUserCards(idUser);
+    if(!result) throw new NotFoundException(`No cards for User Id=${idUser}`);
+    return result;
+  }
   // TODO: CARDS API
   @Get('cards')
   @ApiOkResponse({ type: Promise<Cards[]>, description: 'Get all cards' })
@@ -92,7 +100,7 @@ export class AppController {
     return result;
   }
 
-  @Post('cards')
+  @Post('createCard')
   @ApiOkResponse({ type: Promise<Cards>, description: 'Create card' })
   async createCard(
     @Body() cardData: CreateCardDto
@@ -100,7 +108,7 @@ export class AppController {
     return this.cardsService.createCard(cardData);
   }
 
-  @Patch('cards')
+  @Patch('updateCard')
   @ApiOkResponse({ type: Promise<Cards>, description: 'Update card' })
   async patchCard (
   @Body() cardData : UpdateCardDto
@@ -111,7 +119,7 @@ export class AppController {
     return result;
   }
 
-  @Delete('cards:id')
+  @Delete('deleteCard:id')
   @ApiOkResponse({ type: Promise<Cards>, description: 'Delete card' })
   async removeCard(@Param('id',ParseIntPipe) id: number) {
     const card = await this.cardsService.cardById(id);

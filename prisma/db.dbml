@@ -16,6 +16,7 @@ Table Users {
 
 Table Cards {
     id serial [primary key]
+    title varchar
     authorId integer
     cardData varchar
     shared boolean [default: false]

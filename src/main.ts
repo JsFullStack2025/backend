@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-
+import * as bodyParser from 'body-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
@@ -12,8 +12,10 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type'], // Разрешаем только этот заголовок
     exposedHeaders: ['Set-Cookie'], // Разрешаем передачу куки
   });
-  
+
   app.use(cookieParser());
+  app.use(bodyParser.json({limit: '1mb'}));
+  app.use(bodyParser.urlencoded({limit: '1mb', extended: true}));
   const config = new DocumentBuilder()
   .setTitle('Visiteo API')
   .setDescription('Visiteo API description')
