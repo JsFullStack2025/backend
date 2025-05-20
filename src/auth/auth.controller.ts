@@ -23,6 +23,10 @@ import { UsersService} from  '@/users/users.service'
 
     @Post('registration')
     async registerUser(@Body() reg: CreateUsersDto) {
+      const user = await this.userService.findOne(reg.username)
+      if(user){
+        throw 'User already exists';
+      }
       return await this.userService.createUser(reg);
     }
 
