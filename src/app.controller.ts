@@ -55,7 +55,7 @@ export class AppController {
   }
 
   @Patch('user')
-  // @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(JwtAuthGuard)//, UserGuard)
   @ApiOkResponse({ type: Promise<Users>, description: 'Update user' })
   async patchUser (
     @Body() userData : UpdateUserDto
@@ -67,7 +67,7 @@ export class AppController {
   }
 
   @Delete('user:id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard)//, AdminGuard)
   @ApiOkResponse({ type: Promise<Users[]>, description: 'Delete user' })
   @ApiNotFoundResponse({ })
   async removeUser(@Param('id',ParseIntPipe) id: number) {
@@ -77,7 +77,7 @@ export class AppController {
     return result;
   }
  @Get('user:id/cards')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  @UseGuards(JwtAuthGuard)//, UserGuard)
   @ApiOkResponse({ type: Promise<Users>, description: 'Get user cards' })
   @ApiOkResponse({type: Promise<Users | null>})
   async getUserCards(@Param('id',ParseIntPipe) idUser: number) : Promise<Cards[]| null> {
