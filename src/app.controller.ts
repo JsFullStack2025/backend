@@ -11,6 +11,7 @@ import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from './auth/jwt.guard';
 import { UserGuard, AdminGuard } from './auth/roles.guard';
 import { CreateCardTypeDto, UpdateCardTypeDto } from './Entities/CardDesign.dto';
+import { request } from 'http';
 
 @Controller()
 export class AppController {
@@ -55,11 +56,13 @@ export class AppController {
   }
 
   @Patch('user')
-  @UseGuards(JwtAuthGuard)//, UserGuard)
+  @UseGuards(JwtAuthGuard, UserGuard)
   @ApiOkResponse({ type: Promise<Users>, description: 'Update user' })
   async patchUser (
     @Body() userData : UpdateUserDto
   ) : Promise<Users> {
+    //if(request.user.id!==userData.id) return "Не твоя карточка";
+
     const user = await this.userService.userById(userData.id);
     if(!user) throw new NotFoundException(`User с Id=${userData.id} не найден`);
     const result = await this.userService.updateUser(userData);
