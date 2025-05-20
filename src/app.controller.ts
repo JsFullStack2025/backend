@@ -55,7 +55,7 @@ export class AppController {
   }
 
   @Patch('user')
-  @UseGuards(JwtAuthGuard, UserGuard)
+  // @UseGuards(JwtAuthGuard, UserGuard)
   @ApiOkResponse({ type: Promise<Users>, description: 'Update user' })
   async patchUser (
     @Body() userData : UpdateUserDto
