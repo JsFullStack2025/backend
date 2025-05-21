@@ -17,6 +17,7 @@ import { RefreshAuthGuard } from './refresh.guard';
 
 import { Recaptcha } from "@nestlab/google-recaptcha"
 import { GoogleGuard } from './ouath.guard';
+import { ConfigService } from '@nestjs/config';
 
 
 
@@ -24,7 +25,7 @@ import { GoogleGuard } from './ouath.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) { }
-
+  private readonly configService: ConfigService
   // @Post('registration')
   // async registerUser(@Body() reg: RegistrationReqModel) {
   //   return await this.authService.registerUser(reg);
@@ -112,7 +113,7 @@ export class AuthController {
       return { msg: 'success', user: user };
     }
     else console.log("res.code", res.statusCode)
-    res.redirect(process.env.CLIENT as string);
+    res.redirect(`${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/`);
   }
 
   @Get('session')
