@@ -42,7 +42,7 @@ export class AuthController {
       refreshToken,
     };
     res.cookie('auth-cookie', secretData, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production', // Только для production 
       sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
       maxAge: 60000,
@@ -73,6 +73,7 @@ export class AuthController {
     };
 
     res.cookie('auth-cookie', secretData, { httpOnly: true });
+    //res.cookie('auth-cookie', secretData, );
     return { msg: 'success' };
   }
 
@@ -97,7 +98,7 @@ export class AuthController {
           refreshToken,
         };
         res.cookie('auth-cookie', secretData, {
-          httpOnly: true,
+          httpOnly: false,
           secure: process.env.NODE_ENV === 'production', // Только для production 
           sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
           maxAge: 60000,
