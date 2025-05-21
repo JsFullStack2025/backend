@@ -6,11 +6,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class MinioController {
   constructor(readonly service: MinioService) {}
 
-  @Get('test')
-  test(){
-    return "Ok";
-  }
-
   @Get('buckets')
   bucketsList() {
     return this.service.bucketsList();
@@ -23,11 +18,7 @@ export class MinioController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(
-    @UploadedFile('file') file: Express.Multer.File,
-  ) {
-    //payload.file = file;
-    //console.log(file);
+  uploadFile(@UploadedFile('file') file: Express.Multer.File) {
     return this.service.uploadFile(file);
   }
 }
