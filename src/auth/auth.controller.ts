@@ -18,18 +18,27 @@ import { RefreshAuthGuard } from './refresh.guard';
 import { Recaptcha } from "@nestlab/google-recaptcha"
 import { GoogleGuard } from './ouath.guard';
 import { ConfigService } from '@nestjs/config';
+import { CreateUsersDto } from '@/Entities/Users.dto';
+import { UsersService} from  '@/users/users.service'
 
 
 
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private userService: UsersService) {}
   private readonly configService: ConfigService
-  // @Post('registration')
-  // async registerUser(@Body() reg: RegistrationReqModel) {
-  //   return await this.authService.registerUser(reg);
-  // }
+
+  @Recaptcha()
+   @Post('registration')
+    async registerUser(@Body() reg: CreateUsersDto) {
+      const user = await this.userService.findOne(reg.username)
+      if(user){
+        throw 'User already exists';
+      }
+      return await this.userService.createUser(reg);
+    }
+
 
   @Recaptcha()
   @Post('login')
@@ -38,11 +47,13 @@ export class AuthController {
     const token = await this.authService.getJwtToken(req.user as JwtPayload);
     const refreshToken = await this.authService.getRefreshToken(req.user.id);
     const secretData = {
+      userId: req.user.id,
+      userName: req.user.username,
       token,
       refreshToken,
     };
     res.cookie('auth-cookie', secretData, {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Только для production 
       sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
       maxAge: 60000,
@@ -73,7 +84,6 @@ export class AuthController {
     };
 
     res.cookie('auth-cookie', secretData, { httpOnly: true });
-    //res.cookie('auth-cookie', secretData, );
     return { msg: 'success' };
   }
 
@@ -98,7 +108,7 @@ export class AuthController {
           refreshToken,
         };
         res.cookie('auth-cookie', secretData, {
-          httpOnly: false,
+          httpOnly: true,
           secure: process.env.NODE_ENV === 'production', // Только для production 
           sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
           maxAge: 60000,
