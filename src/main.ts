@@ -6,7 +6,7 @@ import * as bodyParser from 'body-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'http://localhost:3000', // Разрешаем только этот домен
+    origin: process.env.CLIENT, // Разрешаем только этот домен
     credentials: true, // Разрешаем передачу куки
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Разрешаем только эти методы
     allowedHeaders: ['Content-Type'], // Разрешаем только этот заголовок
@@ -14,13 +14,13 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
-  app.use(bodyParser.json({limit: '1mb'}));
-  app.use(bodyParser.urlencoded({limit: '1mb', extended: true}));
+  app.use(bodyParser.json({ limit: '1mb' }));
+  app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
   const config = new DocumentBuilder()
-  .setTitle('Visiteo API')
-  .setDescription('Visiteo API description')
-  .setVersion('1.0')
-  .build();
+    .setTitle('Visiteo API')
+    .setDescription('Visiteo API description')
+    .setVersion('1.0')
+    .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
