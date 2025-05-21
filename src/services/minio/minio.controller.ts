@@ -11,6 +11,11 @@ export class MinioController {
     return this.service.bucketsList();
   }
 
+  @Get('objects')
+  getObjects() {
+    return this.service.listObjects()
+  }
+
   @Get('file/:name')
   getFile(@Param('name') name: string) {
     return this.service.getFile(name);

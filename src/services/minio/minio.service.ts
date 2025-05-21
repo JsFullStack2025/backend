@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { Client } from 'minio';
+import { BucketItem, Client } from 'minio';
 import { minioConfig} from './minio.config'
 
 @Injectable()
@@ -12,6 +12,23 @@ export class MinioService {
   async bucketsList() {
     return await this.minioClient.listBuckets();
   }
+
+  async listObjects(): Promise<BucketItem[]> {
+    const objects: BucketItem[] = [];
+    const stream = this.minioClient.listObjects(this._bucketName, '', true);
+
+    return new Promise((resolve, reject) => {
+        stream.on('data', (item: BucketItem) => {
+            objects.push(item);
+        });
+        stream.on('error', (err) => {
+            reject(err);
+        });
+        stream.on('end', () => {
+            resolve(objects);
+        });
+    });
+}
 
   async getFile(filename: string) {
     return await this.minioClient.presignedUrl(
@@ -33,7 +50,12 @@ export class MinioService {
           if (error) {
             reject(error);
           } else {
-            resolve(objInfo);
+            const result = {
+              url: 'http://'+minioConfig.endPoint+':'+minioConfig.port+'/'+this._bucketName+'/'+filename,
+              filename: filename,
+              objInfo: objInfo
+            }
+            resolve(result);
           }
         },
       );
