@@ -11,6 +11,7 @@ import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from './auth/jwt.guard';
 import { UserGuard, AdminGuard } from './auth/roles.guard';
 import { CreateCardTypeDto, UpdateCardTypeDto } from './Entities/CardDesign.dto';
+import { request } from 'http';
 
 @Controller()
 export class AppController {
@@ -60,6 +61,8 @@ export class AppController {
   async patchUser (
     @Body() userData : UpdateUserDto
   ) : Promise<Users> {
+    //if(request.user.id!==userData.id) return "Не твоя карточка";
+
     const user = await this.userService.userById(userData.id);
     if(!user) throw new NotFoundException(`User с Id=${userData.id} не найден`);
     const result = await this.userService.updateUser(userData);
@@ -67,7 +70,7 @@ export class AppController {
   }
 
   @Delete('user:id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard)//, AdminGuard)
   @ApiOkResponse({ type: Promise<Users[]>, description: 'Delete user' })
   @ApiNotFoundResponse({ })
   async removeUser(@Param('id',ParseIntPipe) id: number) {
@@ -76,7 +79,15 @@ export class AppController {
     const result = this.userService.deleteUser(id);
     return result;
   }
-
+ @Get('user:id/cards')
+  @UseGuards(JwtAuthGuard)//, UserGuard)
+  @ApiOkResponse({ type: Promise<Users>, description: 'Get user cards' })
+  @ApiOkResponse({type: Promise<Users | null>})
+  async getUserCards(@Param('id',ParseIntPipe) idUser: number) : Promise<Cards[]| null> {
+    const result = await this.userService.getUserCards(idUser);
+    if(!result) throw new NotFoundException(`No cards for User Id=${idUser}`);
+    return result;
+  }
   // TODO: CARDS API
   @Get('cards')
   @ApiOkResponse({ type: Promise<Cards[]>, description: 'Get all cards' })
@@ -92,7 +103,7 @@ export class AppController {
     return result;
   }
 
-  @Post('cards')
+  @Post('createCard')
   @ApiOkResponse({ type: Promise<Cards>, description: 'Create card' })
   async createCard(
     @Body() cardData: CreateCardDto
@@ -100,7 +111,7 @@ export class AppController {
     return this.cardsService.createCard(cardData);
   }
 
-  @Patch('cards')
+  @Patch('updateCard')
   @ApiOkResponse({ type: Promise<Cards>, description: 'Update card' })
   async patchCard (
   @Body() cardData : UpdateCardDto
@@ -111,7 +122,7 @@ export class AppController {
     return result;
   }
 
-  @Delete('cards:id')
+  @Delete('deleteCard:id')
   @ApiOkResponse({ type: Promise<Cards>, description: 'Delete card' })
   async removeCard(@Param('id',ParseIntPipe) id: number) {
     const card = await this.cardsService.cardById(id);
@@ -148,10 +159,9 @@ export class AppController {
   async patchCardType (
   @Body() cardData : UpdateCardTypeDto
   ) : Promise<CardTypes> {
-    const card = await this.cardsService.cardById(cardData.id);
-    if(!card) throw new NotFoundException(`Card с Id=${cardData.id} не найден`);
-    const result = this.cardTypesService.updateCardType(cardData);
-    return result;
+    const card = await this.cardTypesService.cardTypeById(cardData.id);
+    if(!card) throw new NotFoundException(`Card type с Id=${cardData.id} не найден`);
+    return this.cardTypesService.updateCardType(cardData);
   }
 
   @Delete('cardtypes:id')
@@ -160,7 +170,6 @@ export class AppController {
     const card = await this.cardTypesService.cardTypeById(id);
     if(!card) throw new NotFoundException(`Card type с Id=${id} не найден`);
     if(card.readonly ) throw new NotFoundException(`Card type с Id=${id} только для чтения, удалять нельзя`);
-    const result = this.cardTypesService.deleteCardType(id);
-    return result;
+    return this.cardTypesService.deleteCardType(id);
   }
 }

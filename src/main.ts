@@ -6,6 +6,7 @@ import { Session } from 'inspector/promises';
 import { max } from 'class-validator';
 import * as session from 'express-session';
 
+import * as bodyParser from 'body-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
@@ -27,6 +28,10 @@ async function bootstrap() {
       }
     })
   );
+
+  app.use(cookieParser());
+  app.use(bodyParser.json({limit: '1mb'}));
+  app.use(bodyParser.urlencoded({limit: '1mb', extended: true}));
   const config = new DocumentBuilder()
   .setTitle('Visiteo API')
   .setDescription('Visiteo API description')

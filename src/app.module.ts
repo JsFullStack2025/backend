@@ -9,6 +9,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AuthController } from './auth/auth.controller'
 import { AuthService } from './auth/auth.service';
+//import { MinioModule } from './services/minio/minio.module';
+import { MinioController } from './services/minio/minio.controller';
+import { MinioService } from './services/minio/minio.service';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './auth/local.strategy';
 
@@ -18,11 +21,11 @@ import { LocalStrategy } from './auth/local.strategy';
 @Module({
   imports: [
     AuthModule,
-    UsersModule,
+    UsersModule,   
     PassportModule,
     //HttpModule,
     ],
-  controllers: [AppController, AuthController],
-  providers: [AuthService, AppService, PrismaService, UsersService, CardsService, CardTypesService, LocalStrategy],
+  controllers: [AppController, AuthController, MinioController],
+  providers: [AuthService, MinioService, AppService, PrismaService, UsersService, CardsService, CardTypesService, MinioService, LocalStrategy],
 })
 export class AppModule {}
