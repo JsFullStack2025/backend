@@ -1,9 +1,11 @@
 import { ConfigService } from '@nestjs/config';
 
+const config = new ConfigService();
+
 export const minioConfig = {
-    endPoint: process.env.S3_HOST ?? 'localhost',
-    port: process.env.S3_PORT ? +process.env.S3_PORT : 9000,
-    accessKey: process.env.S3_ACCESS_KEY,
-    secretKey: process.env.S3_SECRET_KEY,
+    endPoint: config.getOrThrow('S3_HOST'),
+    port: +config.getOrThrow('S3_PORT'),
+    accessKey: config.getOrThrow('S3_ACCESS_KEY'),
+    secretKey: config.getOrThrow('S3_SECRET_KEY'),
     useSSL: false,
 }

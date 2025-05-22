@@ -11,9 +11,10 @@ export class CreateUsersDto {
     @IsNotEmpty({ message: 'Не заполнен password' })
     password: string;
 
-    @ApiProperty({ description: "email", nullable: true })
+    @ApiProperty({ description: "email", nullable: false })
+    @IsNotEmpty({ message: 'Не заполнен email' })
     @IsEmail()
-    email?: string;
+    email: string;
 }
 
 export class UpdateUserDto {
@@ -34,4 +35,18 @@ export class UpdateUserTokenDto {
     id: number;
     refreshToken: string;
     refreshTokenExp: Date;
+}
+
+export class UpdatePasswordDto {
+    @ApiProperty({ description: "id пользователя", nullable: false })
+    @IsNotEmpty({ message: 'Не заполнен id пользователя' })
+    id: number;
+
+    @ApiProperty({description:'Old password'})
+    @IsNotEmpty({ message: 'Не заполнен oldpassword' })
+    oldpassword: string;
+
+    @ApiProperty({description:'Old password'})
+    @IsNotEmpty({ message: 'Не заполнен newpassword' })
+    newpassword: string;
 }

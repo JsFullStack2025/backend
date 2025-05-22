@@ -1,14 +1,13 @@
 
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt.payload';
 
 import * as randomToken from 'rand-token';
 import * as moment from 'moment';
-import { UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
-import { use } from 'passport';
+import { UpdateUserTokenDto } from '@/Entities/Users.dto';
+import { checkPasswordHash, getPasswordHash } from '@/auth/hash.helper'
 
 @Injectable()
 export class AuthService {
@@ -17,25 +16,18 @@ export class AuthService {
         private jwtService: JwtService
       ) {}
 
-  private async getPasswordHash(password: string): Promise<string> {
-    return await argon2.hash(password);
-  }
-
-  private async checkPasswordHash(password: string, hash:string) {
-    return await argon2.verify(hash, password);
-  }
-
   public async validateUserCredentials(
-    username: string,
+    email: string,
     password: string,
   ): Promise<JwtPayload | null> {
-    let user = await this.usersService.findOne(username);
-
+    console.log(email)
+    let user = await this.usersService.findOne(email);
+    console.log(user);
     if (user == null) {
       return null;
     }
 
-    const isValidPassword = await this.checkPasswordHash(password, user.password);
+    const isValidPassword = await checkPasswordHash(password, user.password);
     if (!isValidPassword) {
       return null;
     }
@@ -66,13 +58,13 @@ export class AuthService {
   }
 
   public async validRefreshToken(
-    username: string,
+    useremail: string,
     refreshToken: string,
   ): Promise<JwtPayload | null> {
     const currentDate = moment().day(1).toDate();
     let user = await this.usersService.findAny({
       where: {
-        username: username,
+        email: useremail,
         refreshToken: refreshToken,
         refreshTokenExp: {
             gte: currentDate

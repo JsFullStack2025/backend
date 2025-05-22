@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { Cards, Users } from '@prisma/client';
-import { CreateUsersDto, UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
-import * as argon2 from 'argon2';
+import { CreateUsersDto, UpdatePasswordDto, UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
+import { checkPasswordHash, getPasswordHash } from '@/auth/hash.helper'
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) { }
@@ -22,11 +23,26 @@ export class UsersService {
   }
 
   async createUser(userdata: CreateUsersDto): Promise<Users> {
-    const pwd = await argon2.hash(userdata.password);
+    const pwd = await getPasswordHash(userdata.password);
     userdata.password = pwd;
     let user: CreateUsersDto
     return this.prisma.users.create({
       data: userdata
+    });
+  }
+
+  async updatePassword(req: UpdatePasswordDto)
+  {
+    let user = await this.prisma.users.findFirst({where: { id: req.id}})
+    if(user === null) throw ('User not found');
+    if(await checkPasswordHash(req.oldpassword, user.password) === false)
+    {
+      throw('Wrong old password')
+    }
+    user.password = await getPasswordHash(req.newpassword);
+    return this.prisma.users.update({
+      where: { id: req.id },
+      data: user,
     });
   }
 
@@ -53,8 +69,8 @@ export class UsersService {
     });
   }
 
-  async findOne(username: string): Promise<Users | undefined | null> {
-    return this.prisma.users.findFirst({ where: { username: username } });
+  async findOne(useremail: string): Promise<Users | undefined | null> {
+    return this.prisma.users.findFirst({ where: { email: useremail } });
   }
   async findAny(params: any): Promise<Users | undefined | null> {
     return this.prisma.users.findFirst(params);
