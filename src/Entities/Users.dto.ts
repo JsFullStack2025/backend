@@ -11,9 +11,11 @@ export class CreateUsersDto {
     @IsNotEmpty({ message: 'Не заполнен password' })
     password: string;
 
-    @ApiProperty({ description: "email", nullable: true })
-    @IsEmail()
-    email?: string;
+    @ApiProperty({ description: "email", nullable: false })
+    //@IsEmail()
+    @IsNotEmpty({ message: 'Не заполнен email' })
+    @IsString({ message: 'Please Enter Valid email' })
+    email: string;
 }
 
 export class UpdateUserDto {
@@ -25,7 +27,7 @@ export class UpdateUserDto {
     first_name?:string;
     middle_name?:string;
     last_name?:string;
-    email?:string;
+    email:string;
 }
 
 export class UpdateUserTokenDto {

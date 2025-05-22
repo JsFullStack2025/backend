@@ -53,8 +53,8 @@ export class UsersService {
     });
   }
 
-  async findOne(username: string): Promise<Users | undefined | null> {
-    return this.prisma.users.findFirst({ where: { username: username } });
+  async findOne(email: string): Promise<Users | undefined | null> {
+    return this.prisma.users.findFirst({ where: { email: email } });
   }
   async findAny(params: any): Promise<Users | undefined | null> {
     return this.prisma.users.findFirst(params);
