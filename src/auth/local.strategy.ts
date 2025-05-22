@@ -11,8 +11,8 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     super({ usernameField: 'email' }); // for email auth field
   }
 
-  async validate(username: string, password: string): Promise<JwtPayload> {
-    let payload = await this.authservice.validateUserCredentials(username, password);
+  async validate(email: string, password: string): Promise<JwtPayload> {
+    let payload = await this.authservice.validateUserCredentials(email, password);
     if (payload == null) {
       throw new UnauthorizedException();
     }
