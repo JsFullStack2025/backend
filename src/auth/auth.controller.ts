@@ -14,7 +14,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local.guard';
 import { JwtAuthGuard } from './jwt.guard';
 import { RefreshAuthGuard } from './refresh.guard';
-import { CreateUsersDto } from '@/Entities/Users.dto';
+import { CreateUsersDto, UpdatePasswordDto } from '@/Entities/Users.dto';
 import { UsersService} from  '@/users/users.service'
 
   @Controller('auth')
@@ -28,6 +28,12 @@ import { UsersService} from  '@/users/users.service'
         throw 'User already exists';
       }
       return await this.userService.createUser(reg);
+    }
+
+    @Post('changepassword')
+    @UseGuards(JwtAuthGuard)
+    async changePassword(req: UpdatePasswordDto) {
+      return this.userService.updatePassword(req);
     }
 
     @Post('login')
