@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, NotFoundException, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, NotFoundException, UseGuards, Request, HttpException, HttpStatus } from '@nestjs/common';
 import { AppService } from './app.service';
 import { UsersService } from './users/users.service'
 import { Cards, CardTypes, Users } from '@prisma/client';
@@ -65,6 +65,9 @@ export class AppController {
 
     const user = await this.userService.userById(userData.id);
     if(!user) throw new NotFoundException(`User с Id=${userData.id} не найден`);
+    if(userData.email&&user.email !== userData.email ) {
+      if(await this.userService.checkUniqueEmail(userData.email))  throw new HttpException(`Пользователь с email=${userData.email} уже зарегистрирован`, HttpStatus.CONFLICT);
+    }
     const result = await this.userService.updateUser(userData);
     return result;
   }

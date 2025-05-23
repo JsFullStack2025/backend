@@ -9,9 +9,11 @@ import * as randomToken from 'rand-token';
 import * as moment from 'moment';
 import { UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
 import { use } from 'passport';
+import { Users } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
+
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService
@@ -89,5 +91,23 @@ export class AuthService {
     currentUser.username = user.username;
     currentUser.isAdmin = user.isAdmin;
     return currentUser;
+  }
+  public async getUserToken(user:Users, res:any):Promise<Users| null | undefined> {
+     const token = await this.getJwtToken(user as JwtPayload);
+          const refreshToken = await this.getRefreshToken(user.id);
+          const secretData = {
+            userId: user.id,
+            userName:user.username,
+            token,
+            refreshToken,
+          };
+          res.cookie('auth-cookie', secretData, {
+            //httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Только для production
+            sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
+            maxAge: 60000*30,
+          });
+
+          return this.usersService.findOne(user.username)
   }
 }
