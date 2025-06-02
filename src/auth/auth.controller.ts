@@ -86,6 +86,6 @@ import { UsersService} from  '@/users/users.service'
       };
 
       res.cookie('auth-cookie', secretData, { httpOnly: true });
-      return   {msg:'success'};
+      return   {msg:'success', user: req.user };
     }
   }

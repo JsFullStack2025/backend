@@ -38,27 +38,33 @@ export class MinioService {
     );
   }
 
-  uploadFile(file: Express.Multer.File) {
-    return new Promise((resolve, reject) => {
-      const filename = `${randomUUID().toString()}-${file.originalname}`;
-      this.minioClient.putObject(
+  /**
+   * Uploads a file to MinIO storage
+   * @param file The file to upload from Express.Multer
+   * @returns Promise with upload result containing URL and metadata
+   */
+  async uploadFile(file: Express.Multer.File): Promise<{
+    url: string;
+    filename: string;
+    objInfo: any;
+  }> {
+    const filename = `${randomUUID()}-${file.originalname}`;
+
+    try {
+      const objInfo = await this.minioClient.putObject(
         this._bucketName,
         filename,
         file.buffer,
-        file.size,
-        (error, objInfo) => {
-          if (error) {
-            reject(error);
-          } else {
-            const result = {
-              url: 'http://'+minioConfig.endPoint+':'+minioConfig.port+'/'+this._bucketName+'/'+filename,
-              filename: filename,
-              objInfo: objInfo
-            }
-            resolve(result);
-          }
-        },
+        file.size
       );
-    });
+
+      return {
+        url: `http://${minioConfig.endPoint}:${minioConfig.port}/${this._bucketName}/${filename}`,
+        filename,
+        objInfo
+      };
+    } catch (error) {
+      throw new Error(`Failed to upload file to MinIO: ${error.message}`);
+    }
   }
 }
