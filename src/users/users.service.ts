@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { Cards, Users } from '@prisma/client';
 import { CreateUsersDto, UpdatePasswordDto, UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
@@ -46,11 +46,20 @@ export class UsersService {
     });
   }
 
-  async updateUser(userdata: UpdateUserDto): Promise<Users> {
-    return this.prisma.users.update({
+  async updateUser(userdata: UpdateUserDto) {
+    try {
+      let res = await this.prisma.users.update({
       where: { id: userdata.id },
       data: userdata,
+
     });
+     console.log("updateUser", res)
+    return res
+    } catch(error){
+      console.log("updateUser_error", error)
+       throw new HttpException(String(error), HttpStatus.BAD_REQUEST);
+    }
+
   }
 
   async updateUserRefreshToken(userData: UpdateUserTokenDto): Promise<Users> {
@@ -74,5 +83,10 @@ export class UsersService {
   }
   async findAny(params: any): Promise<Users | undefined | null> {
     return this.prisma.users.findFirst(params);
+  }
+   async checkUniqueEmail(email: string): Promise<boolean>{
+    const user = await this.prisma.users.findFirst({ where: { email: email }});
+    if(user != null) return true
+    return false
   }
 }

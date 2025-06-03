@@ -2,12 +2,14 @@ import {
     Body,
     Controller,
     Get,
+    HttpException,
+    HttpStatus,
     Post,
     Req,
     Res,
     UseGuards,
   } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+
 import { response, Response } from 'express';
 import { JwtPayload } from './jwt.payload';
 import { AuthService } from './auth.service';
@@ -17,17 +19,23 @@ import { RefreshAuthGuard } from './refresh.guard';
 import { CreateUsersDto, UpdatePasswordDto } from '@/Entities/Users.dto';
 import { UsersService} from  '@/users/users.service'
 
+
   @Controller('auth')
   export class AuthController {
-    constructor(private authService: AuthService, private userService: UsersService) {}
+    constructor(private authService: AuthService, private usersService: UsersService) {}
 
     @Post('registration')
-    async registerUser(@Body() reg: CreateUsersDto) {
-      const user = await this.userService.findOne(reg.username)
+   async registerUser(@Body() req:CreateUsersDto, @Res({ passthrough: true }) res: Response) {
+      console.log(req.username)
+      const user = await this.usersService.findOne(req.username)
       if(user){
-        throw 'User already exists';
+        //throw 'User already exists';
+       // return {error:true, massage:`Пользователь с Login=${req.username} уже зарегистрирован`};
+       throw new HttpException(`Пользователь с email=${user.email} уже зарегистрирован`, HttpStatus.CONFLICT);
       }
-      return await this.userService.createUser(reg);
+      let newUser = await this.usersService.createUser(req);
+
+      return await this.authService.getUserToken(newUser, res)
     }
 
     @Post('changepassword')
@@ -39,21 +47,8 @@ import { UsersService} from  '@/users/users.service'
     @Post('login')
     @UseGuards(LocalAuthGuard)
     async login(@Req() req, @Res({ passthrough: true }) res: Response) {
-      const token = await this.authService.getJwtToken(req.user as JwtPayload);
-      const refreshToken = await this.authService.getRefreshToken(req.user.id);
-      const secretData = {
-        userId: req.user.id,
-        userName: req.user.username,
-        token,
-        refreshToken,
-      };
-      res.cookie('auth-cookie', secretData, {
-        //httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Только для production
-        sameSite: process.env.NODE_ENV === 'strict', //'production' ? 'strict' : 'lax',
-        maxAge: 60000*30,
-      });
-      return  {msg:'success', user: req.user};
+      console.log(req.user)
+       return await this.authService.getUserToken(req.user, res)
     }
 
     @Post('logout')
@@ -89,3 +84,5 @@ import { UsersService} from  '@/users/users.service'
       return   {msg:'success', user: req.user };
     }
   }
+
+
