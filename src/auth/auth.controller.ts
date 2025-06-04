@@ -9,8 +9,8 @@ import {
 } from "@nestjs/common"
 import { Response, response } from "express"
 
-import { CreateUsersDto, UpdatePasswordDto } from "@/Entities/Users.dto"
-import { UsersService } from "@/users/users.service"
+import { CreateUsersDto, UpdatePasswordDto } from "../../src/Entities/Users.dto"
+import { UsersService } from "../../src/users/users.service"
 
 import { AuthService } from "./auth.service"
 import { JwtAuthGuard } from "./jwt.guard"

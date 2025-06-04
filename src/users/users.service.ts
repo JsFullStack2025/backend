@@ -44,66 +44,78 @@ export class UsersService {
 		const user = await this.prisma.users.findFirst({
 			where: { id: req.id }
 		})
-		if (user === null)
+		if (!user) {
 			throw new HttpException("User not found", HttpStatus.NOT_FOUND)
-		if (
-			(await checkPasswordHash(req.oldpassword, user.password)) === false
-		) {
+		}
+
+		const isPasswordValid = await checkPasswordHash(
+			req.oldpassword,
+			user.password
+		)
+		if (!isPasswordValid) {
 			throw new HttpException(
 				"Wrong old password",
 				HttpStatus.BAD_REQUEST
 			)
 		}
-		user.password = await getPasswordHash(req.newpassword)
+
+		const hashedNewPassword = await getPasswordHash(req.newpassword)
+
 		return this.prisma.users.update({
 			where: { id: req.id },
-			data: user
+			data: { password: hashedNewPassword }
 		})
 	}
 
-	async updateUser(userdata: UpdateUserDto) {
+	async updateUser(userData: UpdateUserDto): Promise<Users> {
 		try {
-			const res = await this.prisma.users.update({
-				where: { id: userdata.id },
-				data: userdata
+			return await this.prisma.users.update({
+				where: { id: userData.id },
+				data: userData
 			})
-			//console.log("updateUser", res)
-			return res
 		} catch (error) {
-			//console.log("updateUser_error", error)
-			throw new HttpException(String(error), HttpStatus.BAD_REQUEST)
+			throw new HttpException(
+				`Failed to update user: ${error.message || String(error)}`,
+				HttpStatus.BAD_REQUEST
+			)
 		}
 	}
 
 	async updateUserRefreshToken(userData: UpdateUserTokenDto): Promise<Users> {
-		const user = await this.findAny({
+		const user = await this.prisma.users.findUnique({
 			where: { id: userData.id }
 		})
-		if (user === null)
+
+		if (!user) {
 			throw new HttpException("User not found", HttpStatus.NOT_FOUND)
+		}
+
 		return this.prisma.users.update({
 			where: { id: userData.id },
 			data: userData
 		})
 	}
 
-	async deleteUser(userid: number): Promise<Users> {
+	async deleteUser(userId: number): Promise<Users> {
 		return this.prisma.users.delete({
-			where: { id: userid }
+			where: { id: userId }
 		})
 	}
 
-	async findOne(userName: string): Promise<Users | undefined | null> {
-		return this.prisma.users.findFirst({ where: { username: userName } })
+	async findOne(username: string): Promise<Users | undefined | null> {
+		return this.prisma.users.findFirst({
+			where: { username }
+		})
 	}
+
 	async findAny(params: any): Promise<Users | undefined | null> {
 		return this.prisma.users.findFirst(params)
 	}
-	async checkUniqueEmail(emailToFind: string): Promise<boolean> {
+	async checkUniqueEmail(email: string): Promise<boolean> {
 		const user = await this.prisma.users.findFirst({
-			where: { email: emailToFind }
+			where: { email }
 		})
-		if (user !== null) return true
-		return false
+
+		return user !== null
 	}
 }
