@@ -4,6 +4,11 @@ export class CreateCardDto {
     @ApiProperty({ description: "Id автора", nullable: false })
     authorId: number;
 
+    @ApiProperty({ description: "title карточки", nullable: true })
+    title?: string;
+    @ApiProperty({ description: "shared url карточки", nullable: true })    
+    sharedUrl?: string;
+
     @ApiProperty({ description: "cardData в формате json", nullable: true })
     cardData?: string;
 

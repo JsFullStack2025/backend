@@ -24,7 +24,7 @@ export class AppController {
 
   @ApiOkResponse({ type: IResponseResult<string>, description: 'Test method' })
   @Get()
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   getHello(): IResponseResult<string> {
     const result: IResponseResult<string>  = { success : true, value: this.appService.getHello()};
     return result;
@@ -43,7 +43,7 @@ export class AppController {
   @ApiOkResponse({type: Promise<Users | null>})
   async getUserById(@Param('id',ParseIntPipe) id: number) : Promise<Users | null> {
     const result = await this.userService.userById(id);
-    if(!result) throw new NotFoundException(`User с Id=${id} не найден`);
+    //if(!result) throw new NotFoundException(`User с Id=${id} не найден`);
     return result;
   }
 

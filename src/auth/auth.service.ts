@@ -9,6 +9,8 @@ import * as moment from 'moment';
 import { UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
 import { use } from 'passport';
 import { Users } from '@prisma/client';
+//import { checkPasswordHash } from './hash.helper';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,11 @@ export class AuthService {
         private usersService: UsersService,
         private jwtService: JwtService
       ) {}
+
+    async checkPasswordHash(password: string, hash:string): Promise<boolean> {
+        return await argon2.verify(hash, password);
+    }
+
 
   public async validateUserCredentials(
     email: string,
@@ -29,7 +36,7 @@ export class AuthService {
       return null;
     }
 
-    const isValidPassword = await checkPasswordHash(password, user.password);
+    const isValidPassword = await this.checkPasswordHash(password, user.password);
     if (!isValidPassword) {
       return null;
     }

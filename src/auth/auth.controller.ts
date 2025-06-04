@@ -25,15 +25,15 @@ import { UsersService} from  '@/users/users.service'
     constructor(private authService: AuthService, private usersService: UsersService) {}
 
     @Post('registration')
-   async registerUser(@Body() req:CreateUsersDto, @Res({ passthrough: true }) res: Response) {
+    async registerUser(@Body() req:CreateUsersDto, @Res({ passthrough: true }) res: Response) {
       console.log(req.username)
       const user = await this.usersService.findOne(req.username)
       if(user){
         //throw 'User already exists';
-       // return {error:true, massage:`Пользователь с Login=${req.username} уже зарегистрирован`};
-       throw new HttpException(`Пользователь с email=${user.email} уже зарегистрирован`, HttpStatus.CONFLICT);
+        return {error:true, massage:`Пользователь с Login=${req.username} уже зарегистрирован`};
+       //throw new HttpException(`Пользователь с email=${user.email} уже зарегистрирован`, HttpStatus.CONFLICT);
       }
-      let newUser = await this.usersService.createUser(req);
+      const newUser = await this.usersService.createUser(req);
 
       return await this.authService.getUserToken(newUser, res)
     }
@@ -41,7 +41,7 @@ import { UsersService} from  '@/users/users.service'
     @Post('changepassword')
     @UseGuards(JwtAuthGuard)
     async changePassword(req: UpdatePasswordDto) {
-      return this.userService.updatePassword(req);
+      return this.usersService.updatePassword(req);
     }
 
     @Post('login')

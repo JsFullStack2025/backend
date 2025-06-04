@@ -2,11 +2,15 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { PrismaService } from '../services/prisma.service';
 import { Cards, Users } from '@prisma/client';
 import { CreateUsersDto, UpdatePasswordDto, UpdateUserDto, UpdateUserTokenDto } from '@/Entities/Users.dto';
-import { checkPasswordHash, getPasswordHash } from '@/auth/hash.helper'
+import * as argon2 from 'argon2';
+import { checkPasswordHash, getPasswordHash } from '../auth/hash.helper';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) { }
+   test(): string {
+    return "test";
+  }
 
   async userById(userid: number): Promise<Users | null> {
     return this.prisma.users.findUnique({
@@ -53,10 +57,10 @@ export class UsersService {
       data: userdata,
 
     });
-     console.log("updateUser", res)
+     //console.log("updateUser", res)
     return res
     } catch(error){
-      console.log("updateUser_error", error)
+      //console.log("updateUser_error", error)
        throw new HttpException(String(error), HttpStatus.BAD_REQUEST);
     }
 
@@ -78,15 +82,15 @@ export class UsersService {
     });
   }
 
-  async findOne(useremail: string): Promise<Users | undefined | null> {
-    return this.prisma.users.findFirst({ where: { email: useremail } });
+  async findOne(userName: string): Promise<Users | undefined | null> {
+    return this.prisma.users.findFirst({ where: { username: userName } });
   }
   async findAny(params: any): Promise<Users | undefined | null> {
     return this.prisma.users.findFirst(params);
   }
-   async checkUniqueEmail(email: string): Promise<boolean>{
-    const user = await this.prisma.users.findFirst({ where: { email: email }});
-    if(user != null) return true
+   async checkUniqueEmail(emailToFind: string): Promise<boolean>{
+    const user = await this.prisma.users.findFirst({ where: { email: emailToFind }});
+    if(user !== null) return true
     return false
   }
 }
