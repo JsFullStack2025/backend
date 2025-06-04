@@ -78,9 +78,7 @@
   "jest": {
     "moduleDirectories": [
       "node_modules",
-      "src",
-      "src/auth",
-      "test"
+      "src"
     ],
     "moduleFileExtensions": [
       "js",

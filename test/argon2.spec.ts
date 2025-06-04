@@ -47,11 +47,11 @@ describe('Argon2 Tests', () => {
       
       // Act
       const result = await checkPasswordHash(wrongPassword, hash);
-      
+
       // Assert
       expect(result).toBe(false);
     });
-    
+
     it('should handle empty password correctly', async () => {
       // Arrange
       const password = '';
