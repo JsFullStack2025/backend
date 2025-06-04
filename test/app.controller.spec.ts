@@ -1,88 +1,86 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from '../src/app.controller';
-import { AppService } from '../src/app.service';
-import { UsersService } from '../src/users/users.service';
-import { CardsService } from '../src/services/cards.service';
-import { CardTypesService } from '../src/services/cardTypes.service';
-import { JwtAuthGuard } from '../src/auth/jwt.guard';
-import { UserGuard, AdminGuard } from '../src/auth/roles.guard';
-import { PrismaService } from '../src/services/prisma.service';
-import { CreateCardDto, UpdateCardDto } from '../src/Entities/Cards.dto';
-import { NotFoundException } from '@nestjs/common';
-import { CreateCardTypeDto } from '@/Entities/CardDesign.dto';
+import { Test, TestingModule } from "@nestjs/testing"
 
-describe('AppController', () => {
-  let controller: AppController;
-  let usersService: UsersService;
-  let cardsService: CardsService;
-  let cardTypesService: CardTypesService;
-  let appService: AppService;
-  let prismaService: PrismaService;
+import { AppController } from "../src/app.controller"
+import { AppService } from "../src/app.service"
+import { JwtAuthGuard } from "../src/auth/jwt.guard"
+import { AdminGuard, UserGuard } from "../src/auth/roles.guard"
+import { CardTypesService } from "../src/services/cardTypes.service"
+import { CardsService } from "../src/services/cards.service"
+import { PrismaService } from "../src/services/prisma.service"
+import { UsersService } from "../src/users/users.service"
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [
-        AppService,
-        PrismaService,
-        UsersService,
-        CardsService,
-        CardTypesService,
-      ],
-    })
-      .overrideGuard(JwtAuthGuard)
-      .useValue({ canActivate: jest.fn().mockReturnValue(true) })
-      .overrideGuard(UserGuard)
-      .useValue({ canActivate: jest.fn().mockReturnValue(true) })
-      .overrideGuard(AdminGuard)
-      .useValue({ canActivate: jest.fn().mockReturnValue(true) })
-      .compile();
+describe("AppController", () => {
+	let controller: AppController
+	let usersService: UsersService
+	let cardsService: CardsService
+	let cardTypesService: CardTypesService
+	let appService: AppService
+	let prismaService: PrismaService
 
-    controller = module.get<AppController>(AppController);
-    prismaService = module.get<PrismaService>(PrismaService);
-    usersService = module.get<UsersService>(UsersService);
-    cardsService = module.get<CardsService>(CardsService);
-    cardTypesService = module.get<CardTypesService>(CardTypesService);
-    appService = module.get<AppService>(AppService);
-  });
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			controllers: [AppController],
+			providers: [
+				AppService,
+				PrismaService,
+				UsersService,
+				CardsService,
+				CardTypesService
+			]
+		})
+			.overrideGuard(JwtAuthGuard)
+			.useValue({ canActivate: jest.fn().mockReturnValue(true) })
+			.overrideGuard(UserGuard)
+			.useValue({ canActivate: jest.fn().mockReturnValue(true) })
+			.overrideGuard(AdminGuard)
+			.useValue({ canActivate: jest.fn().mockReturnValue(true) })
+			.compile()
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+		controller = module.get<AppController>(AppController)
+		prismaService = module.get<PrismaService>(PrismaService)
+		usersService = module.get<UsersService>(UsersService)
+		cardsService = module.get<CardsService>(CardsService)
+		cardTypesService = module.get<CardTypesService>(CardTypesService)
+		appService = module.get<AppService>(AppService)
+	})
 
-  describe('Root endpoint', () => {
-    it('should be defined', () => {
-      expect(controller).toBeDefined();
-    });
-    it('should return from API true', () => {
-      expect(controller.getHello().success).toBe(true);
-    });
-  });
+	afterEach(() => {
+		jest.clearAllMocks()
+	})
 
-  describe('PrismaService', () => {
-    it('should be defined', () => {
-      expect(prismaService).toBeDefined();
-    });
-  });
+	describe("Root endpoint", () => {
+		it("should be defined", () => {
+			expect(controller).toBeDefined()
+		})
+		it("should return from API true", () => {
+			expect(controller.getHello().success).toBe(true)
+		})
+	})
 
-  describe('UsersService', () => {
-    it('should be defined', () => {
-      expect(usersService).toBeDefined();
-    });
-  });
-  describe('CardsService', () => {
-    it('should be defined', () => {
-      expect(cardsService).toBeDefined();
-    });
-  });
-  describe('CardTypesService', () => {
-    it('should be defined', () => {
-      expect(cardTypesService).toBeDefined();
-    });
-  });
-  describe('AppService', () => {
-    it('should be defined', () => {
-      expect(appService).toBeDefined();
-    });
-  });
-});
+	describe("PrismaService", () => {
+		it("should be defined", () => {
+			expect(prismaService).toBeDefined()
+		})
+	})
+
+	describe("UsersService", () => {
+		it("should be defined", () => {
+			expect(usersService).toBeDefined()
+		})
+	})
+	describe("CardsService", () => {
+		it("should be defined", () => {
+			expect(cardsService).toBeDefined()
+		})
+	})
+	describe("CardTypesService", () => {
+		it("should be defined", () => {
+			expect(cardTypesService).toBeDefined()
+		})
+	})
+	describe("AppService", () => {
+		it("should be defined", () => {
+			expect(appService).toBeDefined()
+		})
+	})
+})
