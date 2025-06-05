@@ -2,11 +2,11 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common"
 import { Cards, Users } from "@prisma/client"
 
 import {
-	CreateUsersDto,
 	UpdatePasswordDto,
 	UpdateUserDto,
 	UpdateUserTokenDto
 } from "@/Entities/Users.dto"
+import { RegisterRequestDto } from "@/auth/dto/register-request.dto"
 
 import { checkPasswordHash, getPasswordHash } from "../auth/hash.helper"
 import { PrismaService } from "../services/prisma.service"
@@ -32,11 +32,15 @@ export class UsersService {
 		return this.prisma.users.findMany()
 	}
 
-	async createUser(userdata: CreateUsersDto): Promise<Users> {
+	async createUser(userdata: RegisterRequestDto): Promise<Users> {
 		const pwd = await getPasswordHash(userdata.password)
 		userdata.password = pwd
 		return this.prisma.users.create({
-			data: userdata
+			data: {
+				email: userdata.email,
+				username: userdata.username,
+				password: userdata.password
+			}
 		})
 	}
 
@@ -71,7 +75,9 @@ export class UsersService {
 		try {
 			return await this.prisma.users.update({
 				where: { id: userData.id },
-				data: userData
+				data: {
+					username: userData.username
+				}
 			})
 		} catch (error) {
 			throw new HttpException(
@@ -102,9 +108,9 @@ export class UsersService {
 		})
 	}
 
-	async findOne(username: string): Promise<Users | undefined | null> {
+	async findByEmail(email: string): Promise<Users | undefined | null> {
 		return this.prisma.users.findFirst({
-			where: { username }
+			where: { email }
 		})
 	}
 

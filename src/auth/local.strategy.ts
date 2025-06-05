@@ -12,9 +12,9 @@ export class LocalStrategy extends PassportStrategy(Strategy, "local") {
 		//super({ usernameField: "email" }) // for email auth field
 	}
 
-	async validate(login: string, password: string): Promise<JwtPayload> {
+	async validate(email: string, password: string): Promise<JwtPayload> {
 		const payload = await this.authservice.validateUserCredentials(
-			login,
+			email,
 			password
 		)
 		if (payload == null) {

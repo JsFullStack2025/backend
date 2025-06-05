@@ -23,11 +23,11 @@ export class AuthService {
 	}
 
 	public async validateUserCredentials(
-		login: string,
+		email: string,
 		password: string
 	): Promise<JwtPayload | null> {
-		console.log(login)
-		const user = await this.usersService.findOne(login)
+		console.log(email)
+		const user = await this.usersService.findByEmail(email)
 		console.log(user)
 		if (user == null) {
 			return null
@@ -42,9 +42,8 @@ export class AuthService {
 		}
 
 		const currentUser = new JwtPayload()
-		currentUser.id = user.id
-		currentUser.username = user.username
-		currentUser.isAdmin = user.isAdmin
+		currentUser.userId = user.id
+		currentUser.email = user.email ?? ""
 		return currentUser
 	}
 
@@ -86,16 +85,18 @@ export class AuthService {
 		}
 
 		const currentUser = new JwtPayload()
-		currentUser.id = user.id
-		currentUser.username = user.username
+		currentUser.userId = user.id
+		currentUser.email = user.email ?? ""
 		currentUser.isAdmin = user.isAdmin
 		return currentUser
 	}
-	public async getUserToken(
-		user: Users,
-		res: any
-	): Promise<Users | null | undefined> {
-		const token = await this.getJwtToken(user as JwtPayload)
+	public async getUserToken(user: Users, res: any) {
+		const currentUser = new JwtPayload()
+		currentUser.userId = user.id
+		currentUser.email = user.email ?? ""
+		currentUser.isAdmin = user.isAdmin
+
+		const token = await this.getJwtToken(currentUser)
 		const refreshToken = await this.getRefreshToken(user.id)
 		const secretData = {
 			userId: user.id,
@@ -103,13 +104,17 @@ export class AuthService {
 			token,
 			refreshToken
 		}
-		res.cookie("auth-cookie", secretData, {
+		res.cookie("session", secretData, {
 			//httpOnly: true,
 			secure: process.env.NODE_ENV === "production", // Только для production
 			sameSite: process.env.NODE_ENV === "strict", //'production' ? 'strict' : 'lax',
 			maxAge: 60000 * 30
 		})
 
-		return this.usersService.findOne(user.username)
+		const userData = await this.usersService.findByEmail(user.email ?? "")
+		return {
+			accessToken: token,
+			user: userData
+		}
 	}
 }

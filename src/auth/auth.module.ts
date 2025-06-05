@@ -7,6 +7,7 @@ import { UsersModule } from "../users/users.module"
 import { AuthService } from "./auth.service"
 import { JwtStrategy } from "./jwt.strategy"
 import { LocalStrategy } from "./local.strategy"
+import { OptionalJwtStrategy } from "./optional-jwt.strategy"
 import { RefreshStrategy } from "./refresh.strategy"
 
 @Module({
@@ -19,6 +20,12 @@ import { RefreshStrategy } from "./refresh.strategy"
 		}),
 		PassportModule.register({ defaultStrategy: "jwt" })
 	],
-	providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy]
+	providers: [
+		AuthService,
+		LocalStrategy,
+		JwtStrategy,
+		RefreshStrategy,
+		OptionalJwtStrategy
+	]
 })
 export class AuthModule {}

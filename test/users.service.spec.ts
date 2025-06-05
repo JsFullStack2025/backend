@@ -66,14 +66,16 @@ describe("AppController", () => {
 		// TODO: test CRUD for user
 		describe("create User", () => {
 			it("should create a new user", async () => {
-				const userExists = await usersService.findOne(userData.username)
+				const userExists = await usersService.findByEmail(
+					userData.username
+				)
 				if (!userExists) {
 					const result = await controller.createUser(userData)
 					testUserID = result.id
 					expect(result.username).toEqual(userData.username)
 				} else {
 					//console.log('User already exists');
-					const existingUser = await usersService.findOne(
+					const existingUser = await usersService.findByEmail(
 						userData.username
 					)
 					testUserID = existingUser?.id || 0

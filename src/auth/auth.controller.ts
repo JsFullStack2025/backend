@@ -5,17 +5,18 @@ import {
 	Post,
 	Req,
 	Res,
+	UnauthorizedException,
 	UseGuards
 } from "@nestjs/common"
-import { Response, response } from "express"
+import { Response } from "express"
 
-import { CreateUsersDto, UpdatePasswordDto } from "../../src/Entities/Users.dto"
+import { UpdatePasswordDto } from "../../src/Entities/Users.dto"
 import { UsersService } from "../../src/users/users.service"
 
 import { AuthService } from "./auth.service"
+import { RegisterRequestDto } from "./dto/register-request.dto"
 import { JwtAuthGuard } from "./jwt.guard"
 import { JwtPayload } from "./jwt.payload"
-import { LocalAuthGuard } from "./local.guard"
 import { RefreshAuthGuard } from "./refresh.guard"
 
 @Controller("auth")
@@ -25,22 +26,22 @@ export class AuthController {
 		private usersService: UsersService
 	) {}
 
-	@Post("registration")
+	@Post("register")
 	async registerUser(
-		@Body() req: CreateUsersDto,
+		@Body() data: RegisterRequestDto,
 		@Res({ passthrough: true }) res: Response
 	) {
-		console.log(req.username)
-		const user = await this.usersService.findOne(req.username)
+		console.log(data.username)
+		const user = await this.usersService.findByEmail(data.email)
 		if (user) {
 			//throw 'User already exists';
 			return {
 				error: true,
-				massage: `Пользователь с Login=${req.username} уже зарегистрирован`
+				massage: `Пользователь с Email=${data.username} уже зарегистрирован`
 			}
 			//throw new HttpException(`Пользователь с email=${user.email} уже зарегистрирован`, HttpStatus.CONFLICT);
 		}
-		const newUser = await this.usersService.createUser(req)
+		const newUser = await this.usersService.createUser(data)
 
 		return await this.authService.getUserToken(newUser, res)
 	}
@@ -52,17 +53,27 @@ export class AuthController {
 	}
 
 	@Post("login")
-	@UseGuards(LocalAuthGuard)
-	async login(@Req() req, @Res({ passthrough: true }) res: Response) {
-		console.log(req.user)
-		return await this.authService.getUserToken(req.user, res)
+	async login(
+		@Body() data: RegisterRequestDto,
+		@Res({ passthrough: true }) res: Response
+	) {
+		const payload = await this.authService.validateUserCredentials(
+			data.email,
+			data.password
+		)
+		if (payload == null) {
+			throw new UnauthorizedException()
+		}
+
+		const user = await this.usersService.findByEmail(payload.email)
+		return await this.authService.getUserToken(user!, res)
 	}
 
 	@Post("logout")
 	@UseGuards(JwtAuthGuard)
-	logout() {
-		response.clearCookie("auth-cookie")
-		return {}
+	logout(@Res({ passthrough: true }) res: Response) {
+		res.clearCookie("session")
+		return { message: "Logout success" }
 	}
 
 	@Get("testjwt")
@@ -71,7 +82,7 @@ export class AuthController {
 		return { Work: "Ok", user: req.user }
 	}
 
-	@Get("refresh-tokens")
+	@Get("refresh")
 	@UseGuards(RefreshAuthGuard)
 	async regenerateTokens(
 		@Req() req,
@@ -84,7 +95,14 @@ export class AuthController {
 			refreshToken
 		}
 
-		res.cookie("auth-cookie", secretData, { httpOnly: true })
-		return { msg: "success", user: req.user }
+		res.cookie("session", secretData, { httpOnly: true })
+
+		const userData = await this.usersService.findByEmail(
+			req.user.email ?? ""
+		)
+		return {
+			accessToken: token,
+			user: userData
+		}
 	}
 }

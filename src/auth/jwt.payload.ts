@@ -1,5 +1,5 @@
 export class JwtPayload {
-	id: number
-	username: string
+	userId: number
+	email: string
 	isAdmin: boolean
 }

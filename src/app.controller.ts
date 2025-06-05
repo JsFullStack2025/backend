@@ -10,6 +10,8 @@ import {
 	ParseIntPipe,
 	Patch,
 	Post,
+	Req,
+	UnauthorizedException,
 	UseGuards
 } from "@nestjs/common"
 import { ApiNotFoundResponse, ApiOkResponse } from "@nestjs/swagger"
@@ -18,12 +20,17 @@ import { CardTypes, Cards, Users } from "@prisma/client"
 import { CreateCardTypeDto, UpdateCardTypeDto } from "./Entities/CardDesign.dto"
 import { CreateCardDto, UpdateCardDto } from "./Entities/Cards.dto"
 import { IResponseResult } from "./Entities/IResponseResult"
-import { CreateUsersDto, UpdateUserDto } from "./Entities/Users.dto"
+import { UpdateUserDto } from "./Entities/Users.dto"
 import { AppService } from "./app.service"
+import { RegisterRequestDto } from "./auth/dto/register-request.dto"
 import { JwtAuthGuard } from "./auth/jwt.guard"
+import { OptionalJwtAuthGuard } from "./auth/optional-jwt.guard"
 import { UserGuard } from "./auth/roles.guard"
+import { CreateCardRequestDto } from "./cards/dto/create-card-request.dto"
+import { UpdateCardRequestDto } from "./cards/dto/update-card-request.dto"
 import { CardTypesService } from "./services/cardTypes.service"
 import { CardsService } from "./services/cards.service"
+import { UpdateUserRequestDto } from "./users/dto/update-user-request.dto"
 import { UsersService } from "./users/users.service"
 
 @Controller()
@@ -56,6 +63,23 @@ export class AppController {
 		return this.userService.users()
 	}
 
+	@Get("user/current")
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: Promise<Users>, description: "Get current user" })
+	async getCurrentUser(@Req() req) {
+		return await this.userService.findByEmail(req.user.email)
+	}
+
+	@Patch("user/current")
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: Promise<Users>, description: "Update current user" })
+	async updateCurrentUser(@Req() req, @Body() data: UpdateUserRequestDto) {
+		return this.userService.updateUser({
+			id: req.user.userId,
+			username: data.username
+		})
+	}
+
 	@Get("user:id")
 	@UseGuards(JwtAuthGuard, UserGuard)
 	@ApiOkResponse({ type: Promise<Users>, description: "Get user by ID" })
@@ -70,7 +94,7 @@ export class AppController {
 
 	@Post("user")
 	@ApiOkResponse({ type: Promise<Users>, description: "Create user" })
-	async createUser(@Body() userData: CreateUsersDto): Promise<Users> {
+	async createUser(@Body() userData: RegisterRequestDto): Promise<Users> {
 		return this.userService.createUser(userData)
 	}
 
@@ -116,24 +140,109 @@ export class AppController {
 			throw new NotFoundException(`No cards for User Id=${idUser}`)
 		return result
 	}
-	// TODO: CARDS API
+
 	@Get("cards")
-	@ApiOkResponse({ type: Promise<Cards[]>, description: "Get all cards" })
-	async getCards(): Promise<Cards[] | null> {
-		return this.cardsService.cards()
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({
+		type: Promise<Cards[]>,
+		description: "Get current user cards"
+	})
+	async getCurrentUserCards(@Req() req) {
+		return (await this.cardsService.cardsByUserId(req.user.userId))?.map(
+			(card) => ({
+				id: card.id,
+				name: card.title,
+				isPublic: card.shared,
+				createdAt: new Date().toISOString()
+			})
+		)
 	}
 
-	@Get("cards:id")
-	@ApiOkResponse({
-		type: Promise<Cards | null>,
-		description: "Get card by ID"
-	})
-	async getCardById(
-		@Param("id", ParseIntPipe) id: number
-	): Promise<Cards | null> {
-		const result = await this.cardsService.cardById(id)
-		if (!result) throw new NotFoundException(`Card с Id=${id} не найдена`)
-		return result
+	@Post("cards")
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: Promise<Cards>, description: "Create card" })
+	async createCardByUser(@Req() req, @Body() cardData: CreateCardRequestDto) {
+		const card = await this.cardsService.createUserCard(
+			req.user.userId,
+			cardData
+		)
+		return {
+			id: card.id,
+			name: card.title,
+			content: card.cardData,
+			userId: card.authorId,
+			isPublic: card.shared,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString()
+		}
+	}
+
+	@Patch("cards/:id")
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: Promise<Cards>, description: "Update card" })
+	async updateUserCard(
+		@Req() req,
+		@Param("id", ParseIntPipe) id: number,
+		@Body() data: UpdateCardRequestDto
+	) {
+		const card = await this.cardsService.cardById(id)
+		if (!card) throw new NotFoundException(`Card с Id=${id} не найден`)
+
+		if (card.authorId !== req.user.userId)
+			throw new UnauthorizedException(
+				"You are not the owner of this card"
+			)
+
+		const result = await this.cardsService.updateCardById(id, data)
+		return {
+			id: result.id,
+			name: result.title,
+			content: result.cardData,
+			isPublic: result.shared
+		}
+	}
+
+	@Get("cards/:id")
+	@UseGuards(OptionalJwtAuthGuard)
+	@ApiOkResponse({ type: Promise<Cards>, description: "Update card" })
+	async getCardById(@Req() req, @Param("id", ParseIntPipe) id: number) {
+		const card = await this.cardsService.cardById(id)
+		if (!card) throw new NotFoundException(`Card с Id=${id} не найден`)
+
+		if (!card.shared && req.user && card.authorId !== req.user.userId) {
+			throw new UnauthorizedException(
+				"You are not the owner of this card"
+			)
+		}
+
+		return {
+			id: card.id,
+			name: card.title,
+			content: card.cardData,
+			isPublic: card.shared
+		}
+	}
+
+	@Delete("cards/:id")
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: Promise<Cards>, description: "Delete card" })
+	async deleteCardById(@Req() req, @Param("id", ParseIntPipe) id: number) {
+		const card = await this.cardsService.cardById(id)
+		if (!card) throw new NotFoundException(`Card с Id=${id} не найден`)
+
+		if (card.authorId !== req.user.userId) {
+			throw new UnauthorizedException(
+				"You are not the owner of this card"
+			)
+		}
+
+		await this.cardsService.deleteCard(id)
+		return {
+			id: card.id,
+			name: card.title,
+			content: card.cardData,
+			isPublic: card.shared
+		}
 	}
 
 	@Post("createCard")
