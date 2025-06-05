@@ -1,11 +1,13 @@
 # compiled output
 /dist
+/generated
 /node_modules
 /build
-
+/prisma/migrations
 # Logs
 logs
 *.log
+yarn.lock
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
